@@ -1,0 +1,17 @@
+2023-03-23 14:24:06,423 INFO org.springframework.boot.StartupInfoLogger [main] Starting ApiWebsmsApplication using Java 11.0.17 on DESKTOP-7QP6LFN with PID 5824 (E:\KIWI\2SMOBILE\api-backend-websms\api-websms\target\classes started by User in E:\KIWI\2SMOBILE\api-backend-websms\api-websms)
+2023-03-23 14:24:06,429 DEBUG org.springframework.boot.StartupInfoLogger [main] Running with Spring Boot v2.7.9, Spring v5.3.25
+2023-03-23 14:24:06,431 INFO org.springframework.boot.SpringApplication [main] No active profile set, falling back to 1 default profile: "default"
+2023-03-23 14:24:09,317 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat initialized with port(s): 8400 (http)
+2023-03-23 14:24:09,332 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8400"]
+2023-03-23 14:24:09,333 INFO org.apache.juli.logging.DirectJDKLog [main] Starting service [Tomcat]
+2023-03-23 14:24:09,334 INFO org.apache.juli.logging.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.71]
+2023-03-23 14:24:09,600 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2023-03-23 14:24:09,601 INFO org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 3018 ms
+2023-03-23 14:24:10,681 INFO org.springframework.security.web.DefaultSecurityFilterChain [main] Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@4e424582, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@58dad04a, org.springframework.security.web.context.SecurityContextPersistenceFilter@4f3e9fbb, org.springframework.security.web.header.HeaderWriterFilter@48268eec, org.springframework.security.web.authentication.logout.LogoutFilter@36c7cbe1, org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter@261de205, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@2dfeb141, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7b53b1ad, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3cc053, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@73e776b7, org.springframework.security.web.session.SessionManagementFilter@5df7e31b, org.springframework.security.web.access.ExceptionTranslationFilter@2401856, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@7fb8bad0]
+2023-03-23 14:24:13,707 INFO org.apache.juli.logging.DirectJDKLog [main] Starting ProtocolHandler ["http-nio-8400"]
+2023-03-23 14:24:13,764 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat started on port(s): 8400 (http) with context path ''
+2023-03-23 14:24:13,794 INFO org.springframework.boot.StartupInfoLogger [main] Started ApiWebsmsApplication in 8.477 seconds (JVM running for 9.473)
+2023-03-23 14:25:00,017 INFO org.apache.juli.logging.DirectJDKLog [http-nio-8400-exec-1] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-03-23 14:25:00,020 INFO org.springframework.web.servlet.FrameworkServlet [http-nio-8400-exec-1] Initializing Servlet 'dispatcherServlet'
+2023-03-23 14:25:00,023 INFO org.springframework.web.servlet.FrameworkServlet [http-nio-8400-exec-1] Completed initialization in 3 ms
+2023-03-23 14:55:24,129 INFO org.springdoc.api.AbstractOpenApiResource [http-nio-8400-exec-1] Init duration for springdoc-openapi is: 778 ms
