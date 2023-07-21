@@ -2848,3 +2848,4 @@ org.springframework.web.client.HttpServerErrorException$InternalServerError: 500
 2023-07-21 19:28:04,620 TRACE sn.kiwi.apiwebsms.controllers.PurchaseController [http-nio-8400-exec-3] file: PurchaseController, function: doPurchaseCT, userId:1, customerId: 1, customerId: 1, partnarId: 1, login: admin, clientId: orangesn, urlBackend: http://localhost/2smobile/backend/src/bo/product/PurchaseController.php, ACTION: ACTION_GET_PARAM_PURCHASE_OM
 2023-07-21 19:28:05,727 TRACE sn.kiwi.apiwebsms.controllers.PurchaseController [http-nio-8400-exec-3] Body: {"rc":"-1","error":"Le code de validation saisi est incorrect"}
 2023-07-21 19:28:05,728 ERROR sn.kiwi.apiwebsms.controllers.PurchaseController [http-nio-8400-exec-3] Impossible to make this purchase 
+2023-07-21 20:02:17,004 WARN com.zaxxer.hikari.pool.HikariPool$HouseKeeper [HikariPool-1 housekeeper] HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m37s821ms602µs).
