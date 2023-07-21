@@ -156,7 +156,7 @@ public class ContactController {
         map.add("groupId", ""+ contactForListModel.getGroup_id());
         map.add("sharing", "0");
         map.add("iDisplayStart", "0");
-        map.add("iDisplayLength", "10");
+        map.add("iDisplayLength", "1000000");
         map.add("ACTION", "LIST");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
