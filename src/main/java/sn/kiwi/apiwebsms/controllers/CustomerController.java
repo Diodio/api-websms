@@ -119,8 +119,7 @@ public class CustomerController {
         JSONObject jsonResponseMapper = new JSONObject();
         jsonResponseMapper.put("contactName", jsonResponse.get("contactName"));
         jsonResponseMapper.put("subscriptionDate", jsonResponse.get("createdDate"));
-        //jsonResponseMapper.put("subscriptionType", requestHeaders.get("codeP").toString());
-        System.out.println("prod: " +requestHeaders.get("Cookie").get(0));
+        jsonResponseMapper.put("subscriptionType", jsonResponse.get("type"));
         jsonResponseMapper.put("language", jsonResponse.get("language"));
         ProfilDto profil = mapper.readValue(jsonResponseMapper.toString(), ProfilDto.class);
             logger.trace("************************** End  to get Infos Profil ************************************");
