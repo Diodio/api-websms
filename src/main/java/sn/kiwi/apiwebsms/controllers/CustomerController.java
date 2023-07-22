@@ -48,13 +48,14 @@ public class CustomerController {
     )
 
     public ResponseEntity<?> getCustomerAccount(@RequestBody CustomerInfoReceivedModel customerInfoReceivedModel) throws Exception {
-        logger.trace("************************** Start to send message voice ************************************");
-        logger.trace("file: MessageController, function: sendVoice, userId:"+customerInfoReceivedModel.getUser_id()+", customerId: "+customerInfoReceivedModel.getCustomer_id()+
+        logger.trace("************************** Start to get account customer ************************************");
+        logger.trace("file: MessageController, function: getCustomerAccount, userId:"+customerInfoReceivedModel.getUser_id()+", customerId: "+customerInfoReceivedModel.getCustomer_id()+
                 ", customerId: "+customerInfoReceivedModel.getCustomer_id()+ ", partnarId: "+customerInfoReceivedModel.getPartner_id()+", login: "+customerInfoReceivedModel.getLogin()+"," +
                 " clientId: orangesn, urlBackend: /customer/CustomerController.php, ACTION: GET_CUSTOMER_ACCOUNT" );
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/customer/CustomerController.php";
         RestTemplate restTemplate=new RestTemplate();
+        try{
         HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, customerInfoReceivedModel.getLogin(), customerInfoReceivedModel.getPassword(), customerInfoReceivedModel.getPartner_id());
         System.out.println("requestHeaders: " +requestHeaders);
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
@@ -63,16 +64,23 @@ public class CustomerController {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
         if(response.getStatusCodeValue() != 200){
-            logger.trace("Unable to get account");
+            logger.error("Unable to get account");
             return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get account", HttpStatus.BAD_REQUEST.value()),HttpStatus.BAD_REQUEST);
         }
         JSONObject jsonResponse = new JSONObject(response.getBody().toString());
+        System.out.println("jsonResponse "+ jsonResponse);
         JSONObject jsonResponseMapper = new JSONObject();
         jsonResponseMapper.put("remainingNumberOfSms", jsonResponse.get("remainingNumberOfSms"));
         jsonResponseMapper.put("expirationDate", jsonResponse.get("expirationDate"));
         AccountUserDto myAccount = mapper.readValue(jsonResponseMapper.toString(), AccountUserDto.class);
         logger.trace("myAccount: "+myAccount);
+        logger.trace("************************** End to get account customer ************************************");
         return ResponseEntity.ok(myAccount);
+    } catch (Exception e) {
+        logger.error(e.getMessage());
+        logger.trace("************************** to get account customer ************************************");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+    }
     }
 
 
@@ -89,13 +97,14 @@ public class CustomerController {
                             schema = @Schema(implementation = ProfilDto.class))})}
     )
     public ResponseEntity<?> getInfoProfil(@RequestBody CustomerInfoReceivedModel customerInfoReceivedModel) throws Exception {
-        logger.trace("************************** Start to send message voice ************************************");
-        logger.trace("file: MessageController, function: sendVoice, userId:"+customerInfoReceivedModel.getUser_id()+", customerId: "+customerInfoReceivedModel.getCustomer_id()+
-                ", customerId: "+customerInfoReceivedModel.getCustomer_id()+ ", partnarId: "+customerInfoReceivedModel.getPartner_id()+", login: "+customerInfoReceivedModel.getLogin()+"," +
-                " clientId: orangesn, urlBackend: /customer/CustomerController.php, ACTION: GET_CUSTOMER_ACCOUNT" );
+        logger.trace("************************** Start to get Infos Profil ************************************");
+        logger.trace("file: MessageController, function: getInfoProfil, userId:"+customerInfoReceivedModel.getUser_id()+", customerId: "+customerInfoReceivedModel.getCustomer_id()+
+                ", customerId: "+customerInfoReceivedModel.getCustomer_id()+ ", partnerId: "+customerInfoReceivedModel.getPartner_id()+", login: "+customerInfoReceivedModel.getLogin()+"," +
+                " clientId: orangesn, urlBackend: /customer/UserController.php, ACTION: VIEW" );
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/customer/UserController.php";
         RestTemplate restTemplate=new RestTemplate();
+        try{
         HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, customerInfoReceivedModel.getLogin(), customerInfoReceivedModel.getPassword(), customerInfoReceivedModel.getPartner_id());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("userId", ""+ customerInfoReceivedModel.getUser_id());
@@ -114,6 +123,12 @@ public class CustomerController {
         System.out.println("prod: " +requestHeaders.get("Cookie").get(0));
         jsonResponseMapper.put("language", jsonResponse.get("language"));
         ProfilDto profil = mapper.readValue(jsonResponseMapper.toString(), ProfilDto.class);
+            logger.trace("************************** End  to get Infos Profil ************************************");
         return ResponseEntity.ok(profil);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.trace("************************** End to get Infos Profil ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
     }
 }

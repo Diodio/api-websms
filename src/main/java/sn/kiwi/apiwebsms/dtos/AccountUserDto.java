@@ -15,7 +15,8 @@ public class AccountUserDto {
     public AccountUserDto() {
     }
 
-    public AccountUserDto(String remainingNumberOfSms, String expirationDate) {
+    public AccountUserDto(String remainingNumberOfSms, String expirationDate ) {
+
         this.remainingNumberOfSms = remainingNumberOfSms;
         this.expirationDate = expirationDate;
     }
