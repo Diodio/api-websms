@@ -181,7 +181,7 @@ public class MessageController {
                             schema = @Schema(implementation = MessageListDto.class))})}
     )
     public ResponseEntity<?> getDetailMessage(@RequestBody InfoMessageDetailModel infoMessageDetailModel) throws Exception {
-        logger.trace("************************** Start to send message voice ************************************");
+        logger.trace("************************** Start to get message details ************************************");
         logger.trace("file: MessageController, function: getDetailMessage, userId:" + infoMessageDetailModel.getUser_id() + ", login: " + infoMessageDetailModel.getLogin() + "," +
                 "partnerId: " + infoMessageDetailModel.getPartner_id() + ", clientId: orangesn");
         ObjectMapper mapper = new ObjectMapper();
@@ -198,11 +198,13 @@ public class MessageController {
 
         logger.trace("response: " + response);
         if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
-            logger.trace("Erreur Server");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur Server.");
+            logger.error("Error while processing your request. Please contact your administrator");
+            logger.trace("************************** End to get message details ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator");
         } else {
             MessageDetailDto messageDetailDto = mapper.readValue(response.getBody().toString(), MessageDetailDto.class);
             logger.trace("messageDetailDto: " + messageDetailDto);
+            logger.trace("************************** End to get message details ************************************");
             return ResponseEntity.ok(messageDetailDto);
         }
     }
@@ -220,13 +222,15 @@ public class MessageController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = CallBackModel.class))})}
     )
+
     public ResponseEntity<?> getDetailsCallById(@RequestBody CallBackModel callBackModel) throws Exception {
-        logger.trace("************************** Start to send message voice ************************************");
+        logger.trace("************************** Start to get call details ************************************");
         logger.trace("API Voice, function: getDetailsCallById, callId:" + callBackModel.getCall_id());
         //String callId="7bc4efa5-c871-4482-a740-80c14e3a93e7";
         String callId = callBackModel.getCall_id();
         System.out.println("OK");
         CommonVoice commonVoice = new CommonVoice();
+        try {
         String accessToken = commonVoice.getAPIVoiceToken();
         System.out.println("Call_id: " + callBackModel.getCall_id().toString());
         logger.trace("Call_id: " + callBackModel.getCall_id().toString());
@@ -236,8 +240,13 @@ public class MessageController {
         JsonNode json = objectMapper.convertValue(infoSessionCall, JsonNode.class);
         System.out.println("json infoSessionCall: " + json);
         logger.trace("json infoSessionCall: " + json);
-
+        logger.trace("************************** End to get Details Call By Id ************************************");
         return ResponseEntity.ok(json);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.trace("************************** End to get Details Call By Id ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
     }
 
     // STOP
@@ -269,7 +278,7 @@ public class MessageController {
             logger.trace("response: " + response.getBody());
 
             if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
-                logger.trace("Error while processing your request. Please contact your administrator.");
+                logger.error("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to stop campaign ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
@@ -374,6 +383,7 @@ public class MessageController {
                 int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
                 if (rc != 0) {
                     logger.trace("Unable to remove campaign");
+                    logger.trace("************************** End to remove message ************************************");
                     return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to remove campaign ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
                 }
                 logger.trace("Campaign removed Id: " + messageActionModel.getMessage_id());
@@ -382,6 +392,7 @@ public class MessageController {
             }
         } catch (Exception e) {
             logger.trace(e.getMessage());
+            logger.trace("************************** End to remove message ************************************");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }

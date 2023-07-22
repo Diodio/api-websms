@@ -54,17 +54,24 @@ public class PurchaseController {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
         RestTemplate restTemplate=new RestTemplate();
+        try{
         HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, customerInfoReceivedModel.getLogin(), customerInfoReceivedModel.getPassword(), customerInfoReceivedModel.getPartner_id());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("customerId", ""+ customerInfoReceivedModel.getCustomer_id());
         map.add("ACTION", "LIST_PURCHASES");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-        if(response.getStatusCodeValue() != 200)
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the pack list ", HttpStatus.BAD_REQUEST.value()),HttpStatus.BAD_REQUEST);
-        System.out.println("response: " +response.getBody());
+        if(response.getStatusCodeValue() != 200) {
+            logger.warn("Unable to get the pack list ");
+            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the pack list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+        }
+            System.out.println("response: " +response.getBody());
         PacksListDto[] packs = mapper.readValue(response.getBody().toString(), PacksListDto[].class);
         return ResponseEntity.ok(packs);
+    } catch (Exception e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+    }
     }
 
     @GetMapping(value = "purchases/om", produces = "application/json")
@@ -87,6 +94,7 @@ public class PurchaseController {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PurchaseController.php";
         RestTemplate restTemplate=new RestTemplate();
+        try{
         HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, packModel.getLogin(), packModel.getPassword(), packModel.getPartner_id());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("userId", ""+ packModel.getPartner_id());
@@ -98,7 +106,7 @@ public class PurchaseController {
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
         System.out.println("reponse: " +response);
         if(response==null || response.equals("") || response.getStatusCode().value()!=200) {
-            logger.trace("Error while processing your request. Please contact your administrator.");
+            logger.error("Error while processing your request. Please contact your administrator.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }else {
             System.out.println("Body: " + response.getBody());
@@ -131,6 +139,10 @@ public class PurchaseController {
             logger.trace("packs: " + packs);
             return ResponseEntity.ok(packs);
         }
+    } catch (Exception e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+    }
     }
 
     //Purchase with phone credit
@@ -169,20 +181,20 @@ public class PurchaseController {
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
         System.out.println("reponse: " +response);
         if(response==null || response.equals("") || response.getStatusCode().value()!=200) {
-            logger.trace("Error while processing your request. Please contact your administrator.");
+            logger.error("Error while processing your request. Please contact your administrator.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }else {
             logger.trace("Body: " + response.getBody());
             int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
             if (rc != 0) {
-                logger.trace("Unable to send code validation");
+                logger.warn("Unable to send code validation");
                 return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send code validation", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
             }
             return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
         }
 
         } catch (Exception e) {
-            logger.trace(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
@@ -236,7 +248,7 @@ public class PurchaseController {
             }
 
         } catch (Exception e) {
-            logger.trace(e.getMessage());
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
