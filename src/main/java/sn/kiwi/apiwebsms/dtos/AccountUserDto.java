@@ -8,13 +8,15 @@ import lombok.Setter;
 @Setter
 public class AccountUserDto {
 
-    private String userContactName;
+    private String remainingNumberOfSms;
+    private String expirationDate;
 
 
     public AccountUserDto() {
     }
 
-    public AccountUserDto(String userContactName) {
-        this.userContactName = userContactName;
+    public AccountUserDto(String remainingNumberOfSms, String expirationDate) {
+        this.remainingNumberOfSms = remainingNumberOfSms;
+        this.expirationDate = expirationDate;
     }
 }
