@@ -68,7 +68,7 @@ public class MessageController {
             logger.trace("response: " + response);
             if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
-                logger.trace("************************** End to get all groups ************************************");
+                logger.trace("************************** End to get all messagess ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
             } else {
@@ -96,35 +96,44 @@ public class MessageController {
         logger.trace("file: MessageController, function: sendVoice, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
                 "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: SEND," +
                 "SignatureId:" + messageModel.getSignature());
-        String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
+        try {
+        String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = common.setUserCookies(pathsProperties, messageModel.getLogin(), messageModel.getPassword(), messageModel.getPartner_id());
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("userId", String.valueOf(messageModel.getUser_id()));
-        map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
         map.add("customerId", String.valueOf(messageModel.getCustomer_id()));
-        map.add("groups", String.valueOf(messageModel.getGroups()));
-        map.add("signatureName", String.valueOf(messageModel.getSignatureName()));
-        map.add("groupName", String.valueOf(messageModel.getGroupName()));
-        map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
-        map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
-        map.add("repeatedSMS", "0");
-        map.add("numberOrdreEnvoi", "0");
         map.add("subject", String.valueOf(messageModel.getSubject()));
         map.add("signature", String.valueOf(messageModel.getSignature()));
+        map.add("sourceType", "C");
         map.add("recipients", String.valueOf(messageModel.getRecipients()));
+        map.add("groups", String.valueOf(messageModel.getGroups()));
         map.add("content", String.valueOf(messageModel.getContent()));
-        map.add("sendingType", String.valueOf(messageModel.getSendingType()));
-        map.add("sendingDate", String.valueOf(messageModel.getSendingDate()));
-        map.add("hour", String.valueOf(messageModel.getHour()));
-        map.add("minute", String.valueOf(messageModel.getMinute()));
-        map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
-        map.add("ACTION", "SEND");
+        map.add("sendingType", "I");
+        map.add("notSendBefore", "08:00");
+        map.add("notSendAfter", "20:00");
+        map.add("nbrLines", "");
+        map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
+        map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
+        map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
+        map.add("appId", "WS");
+        map.add("messageId", "0");
+        map.add("ACTION", "START");
         HttpEntity<MultiValueMap<String, String>> requestHeader =
                 new HttpEntity<>(map, headers);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
         System.out.println(response.getBody());
-        return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+        int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+        if(rc == 0)
+            return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+        return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.trace("************************** END SEND MESSSAGE ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
     }
 
 
@@ -184,6 +193,7 @@ public class MessageController {
         logger.trace("************************** Start to get message details ************************************");
         logger.trace("file: MessageController, function: getDetailMessage, userId:" + infoMessageDetailModel.getUser_id() + ", login: " + infoMessageDetailModel.getLogin() + "," +
                 "partnerId: " + infoMessageDetailModel.getPartner_id() + ", clientId: orangesn");
+        try {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
         RestTemplate restTemplate = new RestTemplate();
@@ -191,7 +201,7 @@ public class MessageController {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("userId", String.valueOf(infoMessageDetailModel.getUser_id()));
         map.add("messageId", String.valueOf(infoMessageDetailModel.getMessage_Id()));
-        map.add("tmsg", "MS");
+        map.add("tmsg", "CPG");
         map.add("ACTION", "VIEW_DETAILS");
         HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
@@ -203,10 +213,16 @@ public class MessageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator");
         } else {
             MessageDetailDto messageDetailDto = mapper.readValue(response.getBody().toString(), MessageDetailDto.class);
-            logger.trace("messageDetailDto: " + messageDetailDto);
+            //logger.trace("messageDetailDto: " + messageDetailDto);
             logger.trace("************************** End to get message details ************************************");
             return ResponseEntity.ok(messageDetailDto);
         }
+    }
+        catch (Exception e) {
+        logger.error(e.getMessage());
+        logger.trace("************************** END GET DETAIL MESSSAGE ************************************");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+    }
     }
 
 
