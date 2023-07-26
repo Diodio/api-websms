@@ -114,10 +114,13 @@ public class CustomerController {
         if(response.getStatusCodeValue() != 200)
             return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get info profil ", HttpStatus.BAD_REQUEST.value()),HttpStatus.BAD_REQUEST);
 
+        System.out.println("contactName: " +response.getBody());
         JSONObject jsonResponse = new JSONObject(response.getBody().toString());
         JSONObject jsonResponseMapper = new JSONObject();
         jsonResponseMapper.put("contactName", jsonResponse.get("contactName"));
-        System.out.println("contactName: " +jsonResponse.get("contactName"));
+        jsonResponseMapper.put("subscriptionDate", jsonResponse.get("createdDate"));
+        jsonResponseMapper.put("subscriptionType", jsonResponse.get("type"));
+        jsonResponseMapper.put("language", jsonResponse.get("language"));
         ProfilDto profil = mapper.readValue(jsonResponseMapper.toString(), ProfilDto.class);
             logger.trace("************************** End  to get Infos Profil ************************************");
         return ResponseEntity.ok(profil);
