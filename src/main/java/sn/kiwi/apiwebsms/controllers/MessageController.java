@@ -120,11 +120,17 @@ public class MessageController {
         map.add("minute", String.valueOf(messageModel.getMinute()));
         map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
         map.add("ACTION", "SEND");
-        HttpEntity<MultiValueMap<String, String>> requestHeader =
-                new HttpEntity<>(map, headers);
+        HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
         System.out.println(response.getBody());
-        return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+        if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
+            logger.error("Error while processing your request. Please contact your administrator");
+            logger.trace("************************** End to get message details ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator");
+        } else {
+            logger.trace("************************** End to get message details ************************************");
+            return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+        }
     }
 
 

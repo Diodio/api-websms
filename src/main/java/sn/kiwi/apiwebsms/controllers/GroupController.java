@@ -183,6 +183,8 @@ public class GroupController {
         }
         logger.trace("Group, groupId: "+groupDeleteModel.getGroup_id()+" was successfully deleted");
         logger.trace("************************** Start to delete group ************************************");
-        return ResponseEntity.ok(new ApiDtoResponse(false, "Group is successfully deleted."));
+        return ResponseEntity.ok(new ApiDtoResponse(true, "Group is successfully deleted."));
     }
+
+
 }

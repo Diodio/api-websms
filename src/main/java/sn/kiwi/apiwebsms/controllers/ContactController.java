@@ -243,6 +243,58 @@ public class ContactController {
         }
         logger.trace("Contacts successfully imported.");
         return ResponseEntity.ok(new ApiDtoResponse(true, "Contacts successfully imported."));
+    }
 
+    @PostMapping(value = "contacts/revoke",  produces = "application/json")
+    @Operation(
+            tags = {"Contacts"},
+            operationId = "Contacts",
+            summary = "revoke group contact(s)",
+            description = "revoke contact(s) to the group",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "revoke contacts to the group.",
+                    content = @Content(schema = @Schema(implementation = ImportModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "Contact(s) successfully revoked to the group.")}
+    )
+    public ResponseEntity<?> revokeContacts(@RequestBody ContactListRevokeModel contactListRevokeModel) throws Exception {
+        logger.trace("************************** Start to revoke contacts to tha group ************************************");
+        logger.trace("file: ContactController.java, revokeContacts, userId:"+contactListRevokeModel.getUser_id()+", login: "+contactListRevokeModel.getLogin()+"," +
+                "costumerId: "+contactListRevokeModel.getPartnerId()+", groupId:"+contactListRevokeModel.getGroup_id()+" contactIds: "+contactListRevokeModel.getContactIds()
+                +", clientId: orangesn, urlBackend: /contact/ContactController.php, ACTION: REVOKE");
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+        String backendUrl = pathsProperties.getPathValue("backend.url") + "/contact/ContactController.php";
+        RestTemplate restTemplate=new RestTemplate();
+        HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, contactListRevokeModel.getLogin(), contactListRevokeModel.getPassword(), contactListRevokeModel.getPartnerId());
+        logger.trace("requestHeaders"+pathsProperties, contactListRevokeModel.getLogin(), contactListRevokeModel.getPassword(), contactListRevokeModel.getPartnerId());
+        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        map.add("userId", ""+contactListRevokeModel.getUser_id());
+        map.add("groupId", ""+contactListRevokeModel.getGroup_id());
+        map.add("contactIds", ""+contactListRevokeModel.getContactIds());
+        map.add("ACTION", "REVOKE");
+            logger.trace("userId: ", ""+contactListRevokeModel.getUser_id());
+            logger.trace("groupId", ""+contactListRevokeModel.getGroup_id());
+            logger.trace("contactIds", ""+contactListRevokeModel.getContactIds());
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+        ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+        System.out.println("response: "+response.getBody());
+        int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+            if(response==null || response.equals("") || response.getStatusCode().value()!=200) {
+                logger.trace("Error while processing your request. Please contact your administrator.");
+                logger.trace("************************** End to get all groups ************************************");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+            }
+            else {
+                if (rc != 0) {
+                    logger.trace("Result: Unable to revoke this contact to this group");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to revoke this contact this group", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+                }
+                logger.trace("Group, contactId: " + contactListRevokeModel.getContactIds() + " was successfully revoked to the contactId: " + contactListRevokeModel.getGroup_id());
+                logger.trace("************************** Start to revoke contact to the group ************************************");
+                return ResponseEntity.ok(new ApiDtoResponse(true, "Contact is successfully revoked to the group."));
+            }
+    } catch (Exception e) {
+        logger.trace(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+    }
     }
 }
