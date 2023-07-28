@@ -40,7 +40,7 @@ public class OAuthConfiguration extends AuthorizationServerConfigurerAdapter {
 		.authorizedGrantTypes("password", "authorization_code", "refresh_token").scopes("read","write")
 		.authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER","ADMIN")
 		.autoApprove(true)
-		.accessTokenValiditySeconds(1000)//Access token is only valid for 3 minutes.
+		.accessTokenValiditySeconds(30000)//Access token is only valid for 3 minutes.
         .refreshTokenValiditySeconds(1500);//Refresh token is only valid for 10 minutes.;
 	}
 
