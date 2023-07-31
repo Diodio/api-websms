@@ -44,7 +44,7 @@ public class SignatureController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = SignatureDto.class))})}
     )
-    public ResponseEntity<?> getAllSignatures(@Valid @RequestBody CustomerInfoReceivedModel customerInfoReceivedModel) throws Exception {
+    public ResponseEntity<?> getAllSignatures(@RequestBody CustomerInfoReceivedModel customerInfoReceivedModel) throws Exception {
 
         logger.trace("************************** Start to Get Signature ************************************");
         logger.trace("file: SignatureController, fonction: getAllSignatures, userId:"+customerInfoReceivedModel.getUser_id()+", customerId: "+customerInfoReceivedModel.getCustomer_id()+"," +

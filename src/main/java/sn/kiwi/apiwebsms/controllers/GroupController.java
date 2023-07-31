@@ -1,6 +1,7 @@
 package sn.kiwi.apiwebsms.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -237,12 +238,11 @@ public class GroupController {
             map.add("ACTION", "LIST_CONTACTS_BY_GROUP");
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-            logger.trace("response 1: "+response);
-            System.out.println("response 1: "+response);
-            logger.trace("body : "+response.getBody());
+            //logger.trace("response 1: "+response);
+           // System.out.println("response 1: "+response);
+            //logger.trace("body : "+response.getBody());
             System.out.println("body: "+response.getBody());
 
-            //return null;
             if(response==null || response.equals("") || response.getStatusCode().value()!=200) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to get contacts by group ************************************");
@@ -250,8 +250,8 @@ public class GroupController {
 
             }else {
                 ContactsGroupDto[] groups = mapper.readValue(response.getBody().toString(), ContactsGroupDto[].class);
-                logger.trace("list contacts by group: "+ response);
-                logger.trace("List contacts by group: "+groups);
+                //logger.trace("list contacts by group: "+ response);
+                //logger.trace("List contacts by group: "+groups);
                 logger.trace("************************** End to get contacts by group ************************************");
                 return ResponseEntity.ok(groups);
             }
