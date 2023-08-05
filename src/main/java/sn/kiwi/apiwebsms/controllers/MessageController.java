@@ -21,6 +21,7 @@ import sn.kiwi.apiwebsms.config.PathsProperties;
 import sn.kiwi.apiwebsms.dtos.ApiDtoResponse;
 import sn.kiwi.apiwebsms.dtos.MessageDetailDto;
 import sn.kiwi.apiwebsms.dtos.MessageListDto;
+import sn.kiwi.apiwebsms.dtos.MessagesStatsDto;
 import sn.kiwi.apiwebsms.models.*;
 
 import java.io.File;
@@ -237,17 +238,17 @@ public class MessageController {
         System.out.println("OK");
         CommonVoice commonVoice = new CommonVoice();
         try {
-        String accessToken = commonVoice.getAPIVoiceToken();
-        System.out.println("Call_id: " + callBackModel.getCall_id().toString());
-        logger.trace("Call_id: " + callBackModel.getCall_id().toString());
-        Map<String, String> infoSessionCall = commonVoice.getStatusByCallId(callId, accessToken);
-        System.out.println("infoSessionCall 1: " + infoSessionCall);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode json = objectMapper.convertValue(infoSessionCall, JsonNode.class);
-        System.out.println("json infoSessionCall: " + json);
-        logger.trace("json infoSessionCall: " + json);
-        logger.trace("************************** End to get Details Call By Id ************************************");
-        return ResponseEntity.ok(json);
+            String accessToken = commonVoice.getAPIVoiceToken();
+            System.out.println("Call_id: " + callBackModel.getCall_id().toString());
+            logger.trace("Call_id: " + callBackModel.getCall_id().toString());
+            Map<String, String> infoSessionCall = commonVoice.getStatusByCallId(callId, accessToken);
+            System.out.println("infoSessionCall 1: " + infoSessionCall);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode json = objectMapper.convertValue(infoSessionCall, JsonNode.class);
+            System.out.println("json infoSessionCall: " + json);
+            logger.trace("json infoSessionCall: " + json);
+            logger.trace("************************** End to get Details Call By Id ************************************");
+            return ResponseEntity.ok(json);
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.trace("************************** End to get Details Call By Id ************************************");
@@ -397,9 +398,60 @@ public class MessageController {
                 return ResponseEntity.ok(new ApiDtoResponse(true, "message successfully removed."));
             }
         } catch (Exception e) {
-            logger.trace(e.getMessage());
+            logger.error(e.getMessage());
             logger.trace("************************** End to remove message ************************************");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
+
+    @GetMapping(value = "messages/stats", produces = "application/json")
+    @Operation(
+            tags = {"Messages"},
+            operationId = "Messages",
+            summary = "Get Stats by period of messages",
+            description = "DashBoard: get stats by period of messages",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "DashBoard: get stats by period of messages.",
+                    content = @Content(schema = @Schema(implementation = CustomerModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "DashBoard: get stats by period of messages.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageListDto.class))})}
+    )
+    public ResponseEntity<?> getStatsByPeriod(@RequestBody MessagesStatsModel messagesStatsModel) throws Exception {
+        logger.trace("************************** Start to get stats by period ************************************");
+        logger.trace("file: SimpleMessageController.java, getAllMessages, userId:" + messagesStatsModel.getUser_id() + ", login: " + messagesStatsModel.getLogin() + "," +
+                "costumerId: " + messagesStatsModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: STAT_BY_PERIOD");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, messagesStatsModel.getLogin(), messagesStatsModel.getPassword(), messagesStatsModel.getPartnerId());
+            logger.trace("requestHeaders: " + requestHeaders);
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("userId", "" + messagesStatsModel.getUser_id());
+            map.add("customerId", "" + messagesStatsModel.getCustomer_id());
+            map.add("application_id", "WS");
+            map.add("ACTION", "STAT_BY_PERIOD");
+            map.add("partnerCode", "290573");
+            map.add("period", "" + messagesStatsModel.getPeriod());
+            map.add("startDate", "" + messagesStatsModel.getStartDate());
+            map.add("endDate", "" + messagesStatsModel.getEndDate());
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            logger.trace("body: " + response.getBody());
+            if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
+                logger.trace("Error while processing your request. Please contact your administrator.");
+                logger.trace("************************** End to to get stats by period ************************************");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+
+            } else {
+                MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
+                logger.trace("************************** End to get stats by period ************************************");
+                return ResponseEntity.ok(messageDto);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Catch: Error while processing your request. Please contact your administrator.");
+        }
+    }
+
 }
