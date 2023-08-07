@@ -106,7 +106,7 @@ public class GroupController {
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("userId", ""+groupAddModel.getUser_id());
         map.add("groupName", ""+groupAddModel.getName());
-        map.add("description", ""+groupAddModel.getDescription());
+        map.add("descr", ""+groupAddModel.getDescription());
         map.add("ACTION", "INSERT");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
@@ -117,7 +117,7 @@ public class GroupController {
             return new ResponseEntity<>(new ApiDtoResponse(false, "Group already exists", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
             logger.trace("New group created: Id: "+groupAddModel.getUser_id()+" groupName: "+groupAddModel.getName());
-            return ResponseEntity.ok(new ApiDtoResponse(true, "A new group is successfully created."));
+            return ResponseEntity.ok(new ApiDtoResponse(true, "A new group ("+groupAddModel.getName()+") is successfully created."));
     } catch (Exception e) {
         logger.trace(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
@@ -146,7 +146,7 @@ public class GroupController {
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("userId", ""+groupAddModel.getUser_id());
         map.add("groupName", ""+groupAddModel.getName());
-        map.add("description", ""+groupAddModel.getDescription());
+        map.add("descr", ""+groupAddModel.getDescription());
         map.add("groupId", ""+groupAddModel.getId());
         map.add("ACTION", "UPDATE");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);

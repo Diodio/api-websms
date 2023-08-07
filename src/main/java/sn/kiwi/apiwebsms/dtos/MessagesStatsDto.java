@@ -1,31 +1,29 @@
 package sn.kiwi.apiwebsms.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter @Setter
 public class MessagesStatsDto {
 
-    private String numberSent;
-    private String numberProcess;
-    private String numberPending;
-    private String numberExpired;
-    private String numberRejeted;
-    private String numberNotDelivred;
-    private String numberNoCredits;
-    private String numberDelivred;
+    private String status;
+    private int number;
+    private List<ContactsByStatusDto> contacts;
 
     public MessagesStatsDto() {
     }
 
-    public MessagesStatsDto(String numberSent, String numberProcess, String numberPending, String numberExpired, String numberRejeted, String numberNotDelivred, String numberNoCredits, String numberDelivred) {
-        this.numberSent = numberSent;
-        this.numberProcess = numberProcess;
-        this.numberPending = numberPending;
-        this.numberExpired = numberExpired;
-        this.numberRejeted = numberRejeted;
-        this.numberNotDelivred = numberNotDelivred;
-        this.numberNoCredits = numberNoCredits;
-        this.numberDelivred = numberDelivred;
+    public MessagesStatsDto(String status, int number, List<ContactsByStatusDto> contacts) {
+        this.status = status;
+        this.number = number;
+        this.contacts = contacts;
+    }
+
+    @JsonProperty("contacts")
+    public List<ContactsByStatusDto> getContacts() {
+        return contacts;
     }
 }
