@@ -17,7 +17,7 @@ public class MessagesStatsModel {
     private String user_id;
 
     @NotBlank(message = "partner_id Partner is required.")
-    private long partnerId;
+    private long partner_id;
 
 
     private String customer_id;
