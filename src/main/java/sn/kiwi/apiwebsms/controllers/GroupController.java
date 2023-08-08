@@ -73,7 +73,7 @@ public class GroupController {
 
         }else {
             GroupListDto[] groups = mapper.readValue(response.getBody().toString(), GroupListDto[].class);
-            logger.trace("list Groups: "+ response);
+            logger.trace("list Groups: "+ response.getBody());
             logger.trace("groups: "+groups);
             logger.trace("************************** End to get all groups ************************************");
             return ResponseEntity.ok(groups);
