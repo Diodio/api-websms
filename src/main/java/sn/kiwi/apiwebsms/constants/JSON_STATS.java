@@ -5,9 +5,9 @@ package sn.kiwi.apiwebsms.constants;
     public static String JSON_STATS_BY_PERIOD="[\n" +
             "  {\n" +
             "    \"status\": \"INPROCESS\",\n" +
-            "    \"number\": 0,\n" +
+            "    \"number\": 2,\n" +
             "    \"contacts\": [\n" +
-            "    {\n" +
+            "           {\n" +
             "               \"createdDate\": \"05-08-2023 22:13:00\",\n" +
             "                \"recipient\": \"221775281643\"\n" +
             "              },\n" +
@@ -15,8 +15,102 @@ package sn.kiwi.apiwebsms.constants;
             "                \"createdDate\": \"09-08-2023 22:13:00\",\n" +
             "                \"recipient\": \"221775281643\"\n" +
             "              }\n" +
-            "  ]\n" +
-            " }\n" +
+            "           ]\n" +
+            "       },\n" +
+            "    {\n" +
+            "    \"status\": \"SENT\",\n" +
+            "    \"number\": 3,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"05-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221775281645\"\n" +
+            "              },\n" +
+            "              {\n" +
+            "                \"createdDate\": \"09-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221775281648\"\n" +
+            "              },\n" +
+            "              {\n" +
+            "                \"createdDate\": \"09-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221775281648\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   },\n" +
+            "    {\n" +
+            "    \"status\": \"PENDING\",\n" +
+            "    \"number\": 4,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"07-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221775201645\"\n" +
+            "              },\n" +
+            "              {\n" +
+            "                \"createdDate\": \"08-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221775281648\"\n" +
+            "              },\n" +
+            "              {\n" +
+            "                \"createdDate\": \"08-08-2023 23:13:00\",\n" +
+            "                \"recipient\": \"221774581648\"\n" +
+            "              },\n" +
+            "              {\n" +
+            "                \"createdDate\": \"09-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221773581648\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   },\n" +
+            "    {\n" +
+            "    \"status\": \"EXPIRED\",\n" +
+            "    \"number\": 1,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"05-08-2023 14:13:00\",\n" +
+            "                \"recipient\": \"221775281445\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   },\n" +
+            "    {\n" +
+            "    \"status\": \"UNDELIVERABLE\",\n" +
+            "    \"number\": 1,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"05-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221775071645\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   },\n" +
+            "    {\n" +
+            "    \"status\": \"DELIVRED\",\n" +
+            "    \"number\": 1,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"05-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221772071645\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   },\n" +
+            "    {\n" +
+            "    \"status\": \"NOCREDIT\",\n" +
+            "    \"number\": 1,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"05-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221772071645\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   },\n" +
+            "    {\n" +
+            "    \"status\": \"REJECTED\",\n" +
+            "    \"number\": 2,\n" +
+            "    \"contacts\": [\n" +
+            "              {\n" +
+            "               \"createdDate\": \"06-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221782071645\"\n" +
+            "              },\n" +
+            "              {\n" +
+            "               \"createdDate\": \"07-08-2023 22:13:00\",\n" +
+            "                \"recipient\": \"221779071645\"\n" +
+            "              }\n" +
+            "       ]\n" +
+            "   }\n" +
             "]";
 
      public static String JSON_MESSAGES="[\n" +
