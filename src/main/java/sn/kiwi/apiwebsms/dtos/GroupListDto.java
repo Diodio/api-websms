@@ -11,7 +11,7 @@ public class GroupListDto {
 
     private int value;
     private String text;
-    private String desc;
+    private String desc="néant";
 
     public GroupListDto() {
     }
