@@ -24,4 +24,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		GrantedAuthority authority = new SimpleGrantedAuthority(userInfo.getRole());
 		return new User(userInfo.getUserName(), userInfo.getPassword(), Arrays.asList(authority));
 	}
+
+	public UserInfo loadUser(String userName) throws UsernameNotFoundException {
+		UserInfo userInfo = userInfoDAO.getUserInfoByUserName(userName);
+		return userInfo;
+	}
 }

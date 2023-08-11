@@ -25,6 +25,15 @@ public class UserInfo implements Serializable {
 	@Column(name = "enabled")
 	private short enabled;
 
+	@Column(name = "user_id")
+	private Integer user_id;
+
+	@Column(name = "partner_id")
+	private Integer partner_id;
+
+	@Column(name = "customer_id")
+	private Integer customer_id;
+
 	public String getUserName() {
 		return userName;
 	}
@@ -39,6 +48,18 @@ public class UserInfo implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public void setUser_id(Integer user_id) {
+		this.user_id = user_id;
+	}
+
+	public void setPartner_id(Integer partner_id) {
+		this.partner_id = partner_id;
+	}
+
+	public void setCustomer_id(Integer customer_id) {
+		this.customer_id = customer_id;
 	}
 
 	/**
@@ -69,6 +90,18 @@ public class UserInfo implements Serializable {
 
 	public void setEnabled(short enabled) {
 		this.enabled = enabled;
+	}
+
+	public Integer getUser_id() {
+		return user_id;
+	}
+
+	public Integer getPartner_id() {
+		return partner_id;
+	}
+
+	public Integer getCustomer_id() {
+		return customer_id;
 	}
 
 	@Override
