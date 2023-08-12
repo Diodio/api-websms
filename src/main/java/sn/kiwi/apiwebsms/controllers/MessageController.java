@@ -59,7 +59,8 @@ public class MessageController {
                 "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
+           // String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, messagesListModel.getLogin(), messagesListModel.getPassword(), messagesListModel.getPartnerId());
             logger.trace("requestHeaders: " + requestHeaders);
@@ -75,6 +76,7 @@ public class MessageController {
             if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to get all groups ************************************");
+                logger.trace("************************** End to get all messagess ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
             } else {
@@ -102,40 +104,59 @@ public class MessageController {
         logger.trace("file: MessageController, function: sendVoice, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
                 "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: SEND," +
                 "SignatureId:" + messageModel.getSignature());
-        String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = common.setUserCookies(pathsProperties, messageModel.getLogin(), messageModel.getPassword(), messageModel.getPartner_id());
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("userId", String.valueOf(messageModel.getUser_id()));
-        map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
-        map.add("customerId", String.valueOf(messageModel.getCustomer_id()));
-        map.add("groups", String.valueOf(messageModel.getGroups()));
-        map.add("signatureName", String.valueOf(messageModel.getSignatureName()));
-        map.add("groupName", String.valueOf(messageModel.getGroupName()));
-        map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
-        map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
-        map.add("repeatedSMS", "0");
-        map.add("numberOrdreEnvoi", "0");
-        map.add("subject", String.valueOf(messageModel.getSubject()));
-        map.add("signature", String.valueOf(messageModel.getSignature()));
-        map.add("recipients", String.valueOf(messageModel.getRecipients()));
-        map.add("content", String.valueOf(messageModel.getContent()));
-        map.add("sendingType", String.valueOf(messageModel.getSendingType()));
-        map.add("sendingDate", String.valueOf(messageModel.getSendingDate()));
-        map.add("hour", String.valueOf(messageModel.getHour()));
-        map.add("minute", String.valueOf(messageModel.getMinute()));
-        map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
-        map.add("ACTION", "SEND");
-        HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
-        ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
-        System.out.println(response.getBody());
-        if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
-            logger.error("Error while processing your request. Please contact your administrator");
-            logger.trace("************************** End to get message details ************************************");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator");
-        } else {
-            logger.trace("************************** End to get message details ************************************");
-            return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+        //String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
+        try {
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = common.setUserCookies(pathsProperties, messageModel.getLogin(), messageModel.getPassword(), messageModel.getPartner_id());
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("userId", String.valueOf(messageModel.getUser_id()));
+            map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
+            map.add("customerId", String.valueOf(messageModel.getCustomer_id()));
+            map.add("groups", String.valueOf(messageModel.getGroups()));
+            map.add("signatureName", String.valueOf(messageModel.getSignatureName()));
+            map.add("groupName", String.valueOf(messageModel.getGroupName()));
+            map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
+            map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
+            map.add("repeatedSMS", "0");
+            map.add("numberOrdreEnvoi", "0");
+            map.add("subject", String.valueOf(messageModel.getSubject()));
+            map.add("signature", String.valueOf(messageModel.getSignature()));
+            map.add("sourceType", "C");
+            map.add("recipients", String.valueOf(messageModel.getRecipients()));
+            map.add("groups", String.valueOf(messageModel.getGroups()));
+            map.add("content", String.valueOf(messageModel.getContent()));
+            map.add("sendingType", String.valueOf(messageModel.getSendingType()));
+            map.add("sendingDate", String.valueOf(messageModel.getSendingDate()));
+            map.add("hour", String.valueOf(messageModel.getHour()));
+            map.add("minute", String.valueOf(messageModel.getMinute()));
+            map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
+            map.add("ACTION", "SEND");
+            map.add("sendingType", "I");
+            map.add("notSendBefore", "08:00");
+            map.add("notSendAfter", "20:00");
+            map.add("nbrLines", "");
+            map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
+            map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
+            map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
+            map.add("appId", "WS");
+            map.add("messageId", "0");
+            map.add("ACTION", "START");
+            HttpEntity<MultiValueMap<String, String>> requestHeader =
+                    new HttpEntity<>(map, headers);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
+            System.out.println(response.getBody());
+            //return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+            int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+            if(rc == 0)
+                return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
+            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.trace("************************** END SEND MESSSAGE ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
 
@@ -322,8 +343,8 @@ public class MessageController {
                     content = {@Content(mediaType = "application/json")})}
     )
     public ResponseEntity<?> pauseCampaign(@RequestBody MessageActionModel messageActionModel) throws Exception {
-        logger.trace("************************** Start to stop campaign ************************************");
-        logger.trace("file: CampaignController.java, stopCampaign, userId:" + messageActionModel.getUser_id() + ", login: " + messageActionModel.getLogin() + "," +
+        logger.trace("************************** Start to pause campaign ************************************");
+        logger.trace("file: CampaignController.java, pauseCampaign, userId:" + messageActionModel.getUser_id() + ", login: " + messageActionModel.getLogin() + "," +
                 " clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: PAUSE");
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -354,7 +375,7 @@ public class MessageController {
             }
         } catch (Exception e) {
             logger.trace(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("catch: Error while processing your request. Please contact your administrator.");
         }
     }
 
@@ -364,7 +385,7 @@ public class MessageController {
             tags = {"Messages"},
             operationId = "Messages",
             summary = "Remove sending message",
-            description = "Allows you to pause sending message",
+            description = "Allows you to remove sending message",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Allows you to remove sending message.",
                     content = @Content(schema = @Schema(implementation = MessageActionModel.class))),
             responses = {@ApiResponse(responseCode = "200", description = "Sending sms removed",

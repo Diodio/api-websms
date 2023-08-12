@@ -41,6 +41,7 @@ public class UserInfoService {
 		userInfo.setPassword(userRecord.getPassword());
 		userInfo.setRole(userRecord.getRole());
 		userInfo.setEnabled(userRecord.getEnabled());
+		userInfo.setPartner_code(userRecord.getPartner_code());
 		return userDatailsRepository.save(userInfo);
 	}
 

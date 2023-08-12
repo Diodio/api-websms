@@ -34,6 +34,9 @@ public class UserInfo implements Serializable {
 	@Column(name = "customer_id")
 	private Integer customer_id;
 
+	@Column(name = "partner_code")
+	private String partner_code;
+
 	public String getUserName() {
 		return userName;
 	}
@@ -102,6 +105,14 @@ public class UserInfo implements Serializable {
 
 	public Integer getCustomer_id() {
 		return customer_id;
+	}
+
+	public String getPartner_code() {
+		return partner_code;
+	}
+
+	public void setPartner_code(String userName) {
+		this.partner_code = partner_code;
 	}
 
 	@Override
