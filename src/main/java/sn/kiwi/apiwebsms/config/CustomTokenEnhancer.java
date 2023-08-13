@@ -29,8 +29,9 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         additionalInfo.put("user_id", userInfo.getUser_id());
         additionalInfo.put("customer_id", userInfo.getCustomer_id());
         additionalInfo.put("partner_code", userInfo.getPartner_code());
-        ((DefaultOAuth2AccessToken) accessToken)
-                .setAdditionalInformation(additionalInfo);
+        additionalInfo.put("login", userInfo.getLogin_websms());
+        additionalInfo.put("password", userInfo.getPassword_websms());
+        ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
         return accessToken;
     }
 }

@@ -36,6 +36,10 @@ public class UserInfo implements Serializable {
 
 	@Column(name = "partner_code")
 	private String partner_code;
+	@Column(name = "login_websms")
+	private String login_websms;
+	@Column(name = "password_websms")
+	private String password_websms;
 
 	public String getUserName() {
 		return userName;
@@ -114,6 +118,22 @@ public class UserInfo implements Serializable {
 	public void setPartner_code(String userName) {
 		this.partner_code = partner_code;
 	}
+	public String getLogin_websms() {
+		return login_websms;
+	}
+
+	public void setLogin_websms(String login_websms) {
+		this.login_websms = login_websms;
+	}
+
+	public String getPassword_websms() {
+		return password_websms;
+	}
+
+	public void setPassword_websms(String password_websms) {
+		this.password_websms = password_websms;
+	}
+
 
 	@Override
 	public String toString() {
