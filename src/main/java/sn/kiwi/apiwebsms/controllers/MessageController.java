@@ -59,11 +59,10 @@ public class MessageController {
                 "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
         try {
             ObjectMapper mapper = new ObjectMapper();
-            // String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
             String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, messagesListModel.getLogin(), messagesListModel.getPassword(), messagesListModel.getPartnerId());
-            logger.trace("requestHeaders: " + requestHeaders);
+            //logger.trace("requestHeaders: " + requestHeaders);
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             map.add("userId", "" + messagesListModel.getUser_id());
             map.add("customerId", "" + messagesListModel.getCustomer_id());
@@ -75,13 +74,12 @@ public class MessageController {
             logger.trace("response: " + response);
             if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
-                logger.trace("************************** End to get all groups ************************************");
-                logger.trace("************************** End to get all messagess ************************************");
+                logger.trace("************************** End to get all messages ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
             } else {
                 MessageListDto[] messageDto = mapper.readValue(response.getBody().toString(), MessageListDto[].class);
-                logger.trace("************************** End to get all groups ************************************");
+                logger.trace("************************** End to get all messages ************************************");
                 return ResponseEntity.ok(messageDto);
             }
         } catch (Exception e) {
@@ -104,7 +102,6 @@ public class MessageController {
         logger.trace("file: MessageController, function: sendVoice, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
                 "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: SEND," +
                 "SignatureId:" + messageModel.getSignature());
-        //String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
         try {
             String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
             RestTemplate restTemplate = new RestTemplate();
@@ -146,7 +143,6 @@ public class MessageController {
                     new HttpEntity<>(map, headers);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
             System.out.println(response.getBody());
-            //return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
             int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
             if(rc == 0)
                 return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
@@ -343,8 +339,8 @@ public class MessageController {
                     content = {@Content(mediaType = "application/json")})}
     )
     public ResponseEntity<?> pauseCampaign(@RequestBody MessageActionModel messageActionModel) throws Exception {
-        logger.trace("************************** Start to pause campaign ************************************");
-        logger.trace("file: CampaignController.java, pauseCampaign, userId:" + messageActionModel.getUser_id() + ", login: " + messageActionModel.getLogin() + "," +
+        logger.trace("************************** Start to stop campaign ************************************");
+        logger.trace("file: CampaignController.java, stopCampaign, userId:" + messageActionModel.getUser_id() + ", login: " + messageActionModel.getLogin() + "," +
                 " clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: PAUSE");
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -375,7 +371,7 @@ public class MessageController {
             }
         } catch (Exception e) {
             logger.trace(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("catch: Error while processing your request. Please contact your administrator.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
 
@@ -385,7 +381,7 @@ public class MessageController {
             tags = {"Messages"},
             operationId = "Messages",
             summary = "Remove sending message",
-            description = "Allows you to remove sending message",
+            description = "Allows you to pause sending message",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Allows you to remove sending message.",
                     content = @Content(schema = @Schema(implementation = MessageActionModel.class))),
             responses = {@ApiResponse(responseCode = "200", description = "Sending sms removed",
