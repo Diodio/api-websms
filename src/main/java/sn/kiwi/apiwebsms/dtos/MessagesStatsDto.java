@@ -10,7 +10,7 @@ import java.util.List;
 public class MessagesStatsDto {
 
     private String status;
-    private int number;
+    private int nb;
     private List<ContactsByStatusDto> contacts;
 
     public MessagesStatsDto() {
@@ -18,7 +18,7 @@ public class MessagesStatsDto {
 
     public MessagesStatsDto(String status, int number, List<ContactsByStatusDto> contacts) {
         this.status = status;
-        this.number = number;
+        this.nb = number;
         this.contacts = contacts;
     }
 
