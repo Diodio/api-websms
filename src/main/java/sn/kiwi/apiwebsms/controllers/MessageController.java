@@ -59,7 +59,7 @@ public class MessageController {
                 "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
         try {
             ObjectMapper mapper = new ObjectMapper();
-           // String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
+            // String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/SimpleMessageController.php";
             String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, messagesListModel.getLogin(), messagesListModel.getPassword(), messagesListModel.getPartnerId());
@@ -472,8 +472,8 @@ public class MessageController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
             } else {
-                        //MessagesStatsDto[] messageDto = mapper.readValue(JSON_STATS.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
-                        MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
+                //MessagesStatsDto[] messageDto = mapper.readValue(JSON_STATS.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
+                MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
                 logger.trace("************************** End to get stats by period ************************************");
                 return ResponseEntity.ok(messageDto);
             }
