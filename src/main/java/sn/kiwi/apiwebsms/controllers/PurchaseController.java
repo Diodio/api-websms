@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import sn.kiwi.apiwebsms.common.Common;
 import sn.kiwi.apiwebsms.config.PathsProperties;
+import sn.kiwi.apiwebsms.constants.JsonPacksAudio;
 import sn.kiwi.apiwebsms.dtos.ApiDtoResponse;
 import sn.kiwi.apiwebsms.dtos.GroupListDto;
 import sn.kiwi.apiwebsms.dtos.PacksListDto;
@@ -252,4 +253,44 @@ public class PurchaseController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
+
+
+    //Purchase
+    @GetMapping(value = "packs/audio", produces = "application/json")
+    @Operation(
+            tags = {"Purchases"},
+            operationId = "Purchases",
+            summary = "Get the list of audio packs",
+            description = "Get the list of packs",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of packs.",
+                    content = @Content(schema = @Schema(implementation = CustomerInfoReceivedModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "Found the list of audio packs",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PacksListDto.class))})}
+    )
+    public ResponseEntity<?> getAllAudioPacks(@RequestBody CustomerInfoReceivedModel customerInfoReceivedModel) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
+        RestTemplate restTemplate=new RestTemplate();
+        try{
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, customerInfoReceivedModel.getLogin(), customerInfoReceivedModel.getPassword(), customerInfoReceivedModel.getPartner_id());
+            MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+            map.add("customerId", ""+ customerInfoReceivedModel.getCustomer_id());
+            map.add("ACTION", "LIST_PURCHASES_AUDIO");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            if(response.getStatusCodeValue() != 200) {
+                logger.warn("Unable to get the audio packs list ");
+                return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the audio packs list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            }
+            System.out.println("response: " +response.getBody());
+            PacksListDto[] packs = mapper.readValue(JsonPacksAudio.JSON_LIST_PACKS_AUDIO, PacksListDto[].class);
+            //PacksListDto[] packs = mapper.readValue(response.getBody().toString(), PacksListDto[].class);
+            return ResponseEntity.ok(packs);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
+    }
+
 }

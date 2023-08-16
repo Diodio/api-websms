@@ -1,6 +1,6 @@
 package sn.kiwi.apiwebsms.constants;
 
- public class JSON_STATS {
+ public class JsonStats {
 
     public static String JSON_STATS_BY_PERIOD="[\n" +
             "  {\n" +

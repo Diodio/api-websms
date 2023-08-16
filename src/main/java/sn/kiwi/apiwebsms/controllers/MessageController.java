@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import sn.kiwi.apiwebsms.common.Common;
 import sn.kiwi.apiwebsms.common.CommonVoice;
 import sn.kiwi.apiwebsms.config.PathsProperties;
-import sn.kiwi.apiwebsms.constants.JSON_STATS;
-import sn.kiwi.apiwebsms.constants.JsonClass;
 import sn.kiwi.apiwebsms.dtos.ApiDtoResponse;
 import sn.kiwi.apiwebsms.dtos.MessageDetailDto;
 import sn.kiwi.apiwebsms.dtos.MessageListDto;
@@ -28,8 +25,6 @@ import sn.kiwi.apiwebsms.dtos.MessagesStatsDto;
 import sn.kiwi.apiwebsms.models.*;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 @RestController
@@ -411,7 +406,7 @@ public class MessageController {
             } else {
                 int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
                 if (rc != 0) {
-                    logger.trace("Unable to remove campaign");
+                    logger.trace("Unable to remove campaign because your compaign status is not INIT or PLAN ");
                     logger.trace("************************** End to remove message ************************************");
                     return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to remove campaign ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
                 }
@@ -422,6 +417,55 @@ public class MessageController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.trace("************************** End to remove message ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
+    }
+
+    // PAUSE
+    @PostMapping(value = "message/start")
+    @Operation(
+            tags = {"Messages"},
+            operationId = "Messages",
+            summary = "Start sending message",
+            description = "Allows you to start sending campaign",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Allows you to start sending campaign.",
+                    content = @Content(schema = @Schema(implementation = MessageActionModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "start campaign",
+                    content = {@Content(mediaType = "application/json")})}
+    )
+    public ResponseEntity<?> startCampaign(@RequestBody MessageActionModel messageActionModel) throws Exception {
+        logger.trace("************************** Start to start campaign ************************************");
+        logger.trace("file: CampaignController.java, startCampaign, userId:" + messageActionModel.getUser_id() + ", login: " + messageActionModel.getLogin() + "," +
+                " clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: START");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, messageActionModel.getLogin(), messageActionModel.getPassword(), messageActionModel.getPartner_id());
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("messageId", "" + messageActionModel.getMessage_id());
+            map.add("ACTION", "START");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            logger.trace("body: " + response.getBody());
+
+            if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
+                logger.trace("Error while processing your request. Please contact your administrator.");
+                logger.trace("************************** End to start campaign ************************************");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+
+            } else {
+                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+                if (rc != 0) {
+                    logger.trace("Unable to start campaign");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to start campaign", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+                }
+                logger.trace("Campaign paused Id: " + messageActionModel.getMessage_id());
+                logger.trace("************************** End to start message ************************************");
+                return ResponseEntity.ok(new ApiDtoResponse(true, "message successfully start."));
+            }
+        } catch (Exception e) {
+            logger.trace(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
@@ -439,7 +483,7 @@ public class MessageController {
                             schema = @Schema(implementation = MessageListDto.class))})}
     )
 
-    //EN chantier
+    //DashBoard
     public ResponseEntity<?> getStatsByPeriod(@RequestBody MessagesStatsModel messagesStatsModel) throws Exception {
         logger.trace("************************** Start to get stats by period ************************************");
         logger.trace("file: SimpleMessageController.java, getAllMessages, userId:" + messagesStatsModel.getUser_id() + ", login: " + messagesStatsModel.getLogin() + "," +
@@ -468,7 +512,7 @@ public class MessageController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
             } else {
-                //MessagesStatsDto[] messageDto = mapper.readValue(JSON_STATS.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
+                //MessagesStatsDto[] messageDto = mapper.readValue(JsonStats.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
                 MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
                 logger.trace("************************** End to get stats by period ************************************");
                 return ResponseEntity.ok(messageDto);
