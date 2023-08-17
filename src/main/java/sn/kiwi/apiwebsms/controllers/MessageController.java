@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import sn.kiwi.apiwebsms.common.Common;
 import sn.kiwi.apiwebsms.common.CommonVoice;
 import sn.kiwi.apiwebsms.config.PathsProperties;
+import sn.kiwi.apiwebsms.constants.JsonAudioMessage;
 import sn.kiwi.apiwebsms.dtos.ApiDtoResponse;
 import sn.kiwi.apiwebsms.dtos.MessageDetailDto;
 import sn.kiwi.apiwebsms.dtos.MessageListDto;
@@ -48,8 +49,9 @@ public class MessageController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageListDto.class))})}
     )
+
     public ResponseEntity<?> getAllMessages(@RequestBody MessagesListModel messagesListModel) throws Exception {
-        logger.trace("************************** Start to get all groups ************************************");
+        logger.trace("************************** Start to get all messages ************************************");
         logger.trace("file: SimpleMessageController.java, getAllMessages, userId:" + messagesListModel.getUser_id() + ", login: " + messagesListModel.getLogin() + "," +
                 "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
         try {
@@ -520,6 +522,57 @@ public class MessageController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Catch: Error while processing your request. Please contact your administrator.");
+        }
+    }
+
+
+    @GetMapping(value = "messages/audio", produces = "application/json")
+    @Operation(
+            tags = {"Messages"},
+            operationId = "Messages",
+            summary = "Get the list of audio messages",
+            description = "Get the list of audio messages sent by the customer",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of audio messages.",
+                    content = @Content(schema = @Schema(implementation = CustomerModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "Found the list of audio messages",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MessageListDto.class))})}
+    )
+
+    public ResponseEntity<?> getAllAudioMessages(@RequestBody MessagesListModel messagesListModel) throws Exception {
+        logger.trace("************************** Start to get all audio messages ************************************");
+        logger.trace("file: SimpleMessageController.java, getAllAudioMessages, userId:" + messagesListModel.getUser_id() + ", login: " + messagesListModel.getLogin() + "," +
+                "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, messagesListModel.getLogin(), messagesListModel.getPassword(), messagesListModel.getPartnerId());
+            //logger.trace("requestHeaders: " + requestHeaders);
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("userId", "" + messagesListModel.getUser_id());
+            map.add("customerId", "" + messagesListModel.getCustomer_id());
+            map.add("application_id", "WS");
+            map.add("ACTION", "LIST_DETAILS");
+            map.add("partnerCode", "290573");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            logger.trace("response: " + response.getBody());
+            if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
+                logger.error("Error while processing your request. Please contact your administrator.");
+                logger.error("************************** End to get all audio messages ************************************");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+
+            } else {
+
+                //MessageListDto[] messageDto = mapper.readValue(response.getBody().toString(), MessageListDto[].class);
+                System.out.println("json:" +JsonAudioMessage.JSON_AUDIO_MESSAGES);
+                MessageListDto[] messageDto = mapper.readValue(JsonAudioMessage.JSON_AUDIO_MESSAGES, MessageListDto[].class);
+                logger.trace("************************** End to get all audio messages ************************************");
+                return ResponseEntity.ok(messageDto);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("catch: Error while processing your request. Please contact your administrator.");
         }
     }
 
