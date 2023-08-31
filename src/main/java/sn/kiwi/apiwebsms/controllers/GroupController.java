@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import sn.kiwi.apiwebsms.dtos.MessageDetailDto;
 import sn.kiwi.apiwebsms.models.GroupAddModel;
 import sn.kiwi.apiwebsms.models.GroupDeleteModel;
 import sn.kiwi.apiwebsms.models.GroupListModel;
+
+import java.util.Arrays;
 
 @RestController
 public class GroupController {
@@ -108,13 +111,17 @@ public class GroupController {
         map.add("groupName", ""+groupAddModel.getName());
         map.add("descr", ""+groupAddModel.getDescription());
         map.add("ACTION", "INSERT");
+        map.add("app", "mobile");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
         logger.trace("response: "+response.getBody());
+        logger.trace("map: "+map);
         int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+        System.out.println("rc: "+rc);
         if (rc != 0) {
-            logger.trace("Group already exists");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Group already exists", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            String error = (new JSONObject(response.getBody().toString())).getString("error");
+            logger.trace("error: "+error);
+            return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
             logger.trace("New group created: Id: "+groupAddModel.getUser_id()+" groupName: "+groupAddModel.getName());
             return ResponseEntity.ok(new ApiDtoResponse(true, "A new group ("+groupAddModel.getName()+") is successfully created."));
@@ -154,11 +161,13 @@ public class GroupController {
         System.out.println("response: "+response.getBody());
         int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
         if (rc != 0) {
-            logger.trace("************************** Group already exists ************************************");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Group already exists", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            String error = (new JSONObject(response.getBody().toString())).getString("error");
+            logger.trace(error);
+            logger.trace("************************** end to update group ************************************");
+            return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
             logger.trace("Group, groupeId: "+groupAddModel.getId()+" was successfully updated");
-            logger.trace("************************** Start to update group ************************************");
+            logger.trace("************************** end to update group ************************************");
         return ResponseEntity.ok(new ApiDtoResponse(true, "Group is successfully updated."));
     } catch (Exception e) {
         logger.trace(e.getMessage());
@@ -195,10 +204,11 @@ public class GroupController {
         System.out.println("response: "+response.getBody());
         int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
         if (rc != 0) {
-            logger.trace("Result: Unable to delete this group");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to delete this group", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            String error = (new JSONObject(response.getBody().toString())).getString("error");
+            logger.trace(error);
+            return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
-        logger.trace("Group, groupId: "+groupDeleteModel.getGroup_id()+" was successfully deleted");
+        logger.trace("Group was successfully deleted");
         logger.trace("************************** Start to delete group ************************************");
         return ResponseEntity.ok(new ApiDtoResponse(true, "Group is successfully deleted."));
     } catch (Exception e) {
@@ -242,11 +252,18 @@ public class GroupController {
            // System.out.println("response 1: "+response);
             //logger.trace("body : "+response.getBody());
             System.out.println("body: "+response.getBody());
+            System.out.println("reponse: "+response);
+            System.out.println("code: "+response.getStatusCode());
+            System.out.println("body: "+response.getBody());
+            JSONArray jsonA = new JSONArray(response.getBody().toString());
 
-            if(response==null || response.equals("") || response.getStatusCode().value()!=200) {
+            System.out.println("result: "+jsonA);
+
+
+            if(response.getStatusCode().value()!=200 || (response.getStatusCode().value()==200 && jsonA.isEmpty())) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to get contacts by group ************************************");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Aucune donnée disponible");
 
             }else {
                 ContactsGroupDto[] groups = mapper.readValue(response.getBody().toString(), ContactsGroupDto[].class);
@@ -257,7 +274,7 @@ public class GroupController {
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("catch: Error while processing your request. Please contact your administrator.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
 

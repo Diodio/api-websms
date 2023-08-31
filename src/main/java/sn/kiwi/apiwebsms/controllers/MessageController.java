@@ -52,8 +52,8 @@ public class MessageController {
 
     public ResponseEntity<?> getAllMessages(@RequestBody MessagesListModel messagesListModel) throws Exception {
         logger.trace("************************** Start to get all messages ************************************");
-        logger.trace("file: SimpleMessageController.java, getAllMessages, userId:" + messagesListModel.getUser_id() + ", login: " + messagesListModel.getLogin() + "," +
-                "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
+        logger.trace("file: CampaignController.java, getAllMessages, userId:" + messagesListModel.getUser_id() + ", login: " + messagesListModel.getLogin() + "," +
+                "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: LIST");
         try {
             ObjectMapper mapper = new ObjectMapper();
             String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
@@ -69,6 +69,7 @@ public class MessageController {
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
             logger.trace("response: " + response);
+            logger.trace("status: " + response.getStatusCode());
             if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to get all messages ************************************");
@@ -97,7 +98,7 @@ public class MessageController {
     public ResponseEntity<?> sendSMS(@RequestBody MessageModel messageModel) throws Exception {
         logger.trace("************************** Start to send message voice ************************************");
         logger.trace("file: MessageController, function: sendVoice, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
-                "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: SEND," +
+                "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: SEND," +
                 "SignatureId:" + messageModel.getSignature());
         try {
             String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
@@ -125,7 +126,7 @@ public class MessageController {
             map.add("hour", String.valueOf(messageModel.getHour()));
             map.add("minute", String.valueOf(messageModel.getMinute()));
             map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
-            map.add("ACTION", "SEND");
+           // map.add("ACTION", "SEND");
             map.add("sendingType", "I");
             map.add("notSendBefore", "08:00");
             map.add("notSendAfter", "20:00");
@@ -542,7 +543,7 @@ public class MessageController {
     public ResponseEntity<?> getAllAudioMessages(@RequestBody MessagesListModel messagesListModel) throws Exception {
         logger.trace("************************** Start to get all audio messages ************************************");
         logger.trace("file: SimpleMessageController.java, getAllAudioMessages, userId:" + messagesListModel.getUser_id() + ", login: " + messagesListModel.getLogin() + "," +
-                "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/SimpleMessageController.php, ACTION: LIST");
+                "costumerId: " + messagesListModel.getCustomer_id() + " clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: LIST");
         try {
             ObjectMapper mapper = new ObjectMapper();
             String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
@@ -573,6 +574,80 @@ public class MessageController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("catch: Error while processing your request. Please contact your administrator.");
+        }
+    }
+
+
+    @PostMapping(value = "messages/voice", produces = "application/json")
+    @Operation(
+            tags = {"Messages"},
+            operationId = "Messages",
+            summary = "Send voice campaign",
+            description = "send voice campaign",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Send voice campaign.",
+                    content = @Content(schema = @Schema(implementation = VoiceModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "Voice message successfully sent")}
+    )
+
+    public ResponseEntity<?> sendVoiceCampign(@RequestBody MessageModel messageModel) throws Exception {
+        logger.trace("************************** Start to voice message ************************************");
+        logger.trace("file: MessageController, function: sendVoiceCampign, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
+                "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: SEND," +
+                "SignatureId:" + messageModel.getSignature());
+
+        System.out.println("login: "+messageModel.getLogin()+" , passWord: "+ messageModel.getPassword() );
+        try {
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = common.setUserCookies(pathsProperties, messageModel.getLogin(), messageModel.getPassword(), messageModel.getPartner_id());
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("userId", String.valueOf(messageModel.getUser_id()));
+            map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
+            map.add("customerId", String.valueOf(messageModel.getCustomer_id()));
+            map.add("groups", String.valueOf(messageModel.getGroups()));
+            map.add("signatureName", String.valueOf(messageModel.getSignatureName()));
+            map.add("groupName", String.valueOf(messageModel.getGroupName()));
+            //map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
+            //map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
+            map.add("repeatedSMS", "0");
+            map.add("numberOrdreEnvoi", "0");
+            map.add("subject", String.valueOf(messageModel.getSubject()));
+            map.add("signature", String.valueOf(messageModel.getSignature()));
+            map.add("sourceType", "C");
+            map.add("recipients", String.valueOf(messageModel.getRecipients()));
+            map.add("groups", String.valueOf(messageModel.getGroups()));
+            map.add("content", String.valueOf(messageModel.getContent()));
+            map.add("sendingType", String.valueOf(messageModel.getSendingType()));
+            map.add("sendingDate", String.valueOf(messageModel.getSendingDate()));
+            map.add("hour", String.valueOf(messageModel.getHour()));
+            map.add("minute", String.valueOf(messageModel.getMinute()));
+            map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
+            // map.add("ACTION", "SEND");
+            map.add("sendingType", "I");
+            map.add("notSendBefore", "08:00");
+            map.add("notSendAfter", "20:00");
+            map.add("nbrLines", "");
+            map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
+            map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
+            map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
+            map.add("appId", "WS");
+            map.add("messageId", "0");
+            map.add("ACTION", "START");
+            map.add("TypeMSG", "VOICE");
+            HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
+            System.out.println(response.getBody());
+            int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+
+            if(rc == 0)
+                return ResponseEntity.status(HttpStatus.OK).body("Voice message successfully sent.");
+
+            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send voice message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.trace("************************** END SEND VOICE MESSSAGE ************************************");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
     }
 
