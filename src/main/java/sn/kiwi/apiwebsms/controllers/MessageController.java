@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,11 +71,14 @@ public class MessageController {
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
             logger.trace("response: " + response);
             logger.trace("status: " + response.getStatusCode());
-            if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
+
+            JSONArray jsonRep = new JSONArray(response.getBody().toString());
+            System.out.println("result: "+jsonRep);
+
+            if ((response.getStatusCode().value() != 200) || (response.getStatusCode().value()==200 && jsonRep.isEmpty())) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to get all messages ************************************");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
-
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data available.");
             } else {
                 MessageListDto[] messageDto = mapper.readValue(response.getBody().toString(), MessageListDto[].class);
                 logger.trace("************************** End to get all messages ************************************");
@@ -141,16 +145,20 @@ public class MessageController {
                     new HttpEntity<>(map, headers);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
             System.out.println(response.getBody());
+            logger.trace("Body: "+response.getBody());
             int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
-            if(rc == 0)
+            logger.trace("rc: "+rc);
+            if(rc == 0) {
                 return ResponseEntity.status(HttpStatus.OK).body("Message successfully sent.");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
-
+            }
+            else {
+                return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            }
         }
         catch (Exception e) {
             logger.error(e.getMessage());
             logger.trace("************************** END SEND MESSSAGE ************************************");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Catch Error while processing your request. Please contact your administrator.");
         }
     }
 

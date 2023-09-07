@@ -78,29 +78,41 @@ public class SignatureController {
         logger.trace("************************** Start to Create Signature ************************************");
         logger.trace("file: SignatureController, fonction: createSignature, userId:"+signatureAddModel.getUser_id()+", customerId: "+signatureAddModel.getCustomer_id()+"," +
                 "login: "+signatureAddModel.getLogin()+" clientId: orangesn, urlBackend: /customer/SignatureController.php, ACTION: INSERT");
-        String backendUrl = pathsProperties.getPathValue("backend.url") + "/customer/SignatureController.php";
-        RestTemplate restTemplate=new RestTemplate();
-        HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, signatureAddModel.getLogin(), signatureAddModel.getPassword(), signatureAddModel.getPartnerId());
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-        map.add("userId", ""+signatureAddModel.getUser_id());
-        map.add("customerId", ""+signatureAddModel.getCustomer_id());
-        map.add("libellesignature", ""+signatureAddModel.getName());
-        map.add("ACTION", "INSERT");
-        map.add("libelleSignature", ""+signatureAddModel.getName());
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
-        ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-        logger.trace("response body: "+response.getBody());
-        int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
-        if (rc != 0) {
-            logger.trace("Signature already exists");
-            logger.trace("************************** End to Create Signature ************************************");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Signature already exists", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+        try {
 
+            String backendUrl = pathsProperties.getPathValue("backend.url") + "/customer/SignatureController.php";
+            RestTemplate restTemplate=new RestTemplate();
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, signatureAddModel.getLogin(), signatureAddModel.getPassword(), signatureAddModel.getPartnerId());
+            MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+            map.add("userId", ""+signatureAddModel.getUser_id());
+            map.add("customerId", ""+signatureAddModel.getCustomer_id());
+            map.add("libellesignature", ""+signatureAddModel.getName());
+            map.add("ACTION", "INSERT");
+            map.add("libelleSignature", ""+signatureAddModel.getName());
+            map.add("app", "mobile");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            logger.trace("response: "+response);
+            if(response!=null || response.getBody()!=null){
+                logger.trace("response body: "+response.getBody());
+                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+                if (rc != 0) {
+                    String error = (new JSONObject(response.getBody().toString())).getString("error");
+                    logger.error("Error: "+error);
+                    logger.error("************************** End to Create Signature ************************************");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            logger.trace("Signature created: " + signatureAddModel.getName());
+            logger.trace("************************** End to Create Signature ************************************");
+            return ResponseEntity.ok(new ApiDtoResponse(true, "A new signature was successfully created."));
+        }
+        catch (Exception e) {
+            logger.trace(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
 
-        logger.trace("Signature created: "+ signatureAddModel.getName());
-        logger.trace("************************** End to Create Signature ************************************");
-        return ResponseEntity.ok(new ApiDtoResponse(true, "A new signature was successfully created."));
     }
 
     @DeleteMapping(value = "signatures")

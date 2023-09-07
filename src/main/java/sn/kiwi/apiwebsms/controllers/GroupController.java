@@ -255,15 +255,14 @@ public class GroupController {
             System.out.println("reponse: "+response);
             System.out.println("code: "+response.getStatusCode());
             System.out.println("body: "+response.getBody());
-            JSONArray jsonA = new JSONArray(response.getBody().toString());
 
-            System.out.println("result: "+jsonA);
+            JSONArray jsonRep = new JSONArray(response.getBody().toString());
+            System.out.println("result: "+jsonRep);
 
-
-            if(response.getStatusCode().value()!=200 || (response.getStatusCode().value()==200 && jsonA.isEmpty())) {
+            if(response.getStatusCode().value()!=200 || (response.getStatusCode().value()==200 && jsonRep.isEmpty())) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to get contacts by group ************************************");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Aucune donnée disponible");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data available.");
 
             }else {
                 ContactsGroupDto[] groups = mapper.readValue(response.getBody().toString(), ContactsGroupDto[].class);
