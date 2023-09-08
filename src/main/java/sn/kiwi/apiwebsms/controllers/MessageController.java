@@ -597,9 +597,9 @@ public class MessageController {
             responses = {@ApiResponse(responseCode = "200", description = "Voice message successfully sent")}
     )
 
-    public ResponseEntity<?> sendVoiceCampign(@RequestBody MessageModel messageModel) throws Exception {
+    public ResponseEntity<?> sendVoiceCampaign(@RequestBody MessageModel messageModel) throws Exception {
         logger.trace("************************** Start to voice message ************************************");
-        logger.trace("file: MessageController, function: sendVoiceCampign, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
+        logger.trace("file: MessageController, function: sendVoiceCampaign, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
                 "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: SEND," +
                 "SignatureId:" + messageModel.getSignature());
 
