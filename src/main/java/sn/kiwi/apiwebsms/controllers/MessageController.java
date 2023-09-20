@@ -586,77 +586,99 @@ public class MessageController {
     }
 
 
-    @PostMapping(value = "messages/voice", produces = "application/json")
+@PostMapping(value = "messages/voice", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = "application/json")
     @Operation(
             tags = {"Messages"},
             operationId = "Messages",
             summary = "Send voice campaign",
             description = "send voice campaign",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Send voice campaign.",
-                    content = @Content(schema = @Schema(implementation = VoiceModel.class))),
+                    content = @Content(schema = @Schema(implementation = MessageVoiceModel.class))),
             responses = {@ApiResponse(responseCode = "200", description = "Voice message successfully sent")}
     )
 
-    public ResponseEntity<?> sendVoiceCampaign(@RequestBody MessageModel messageModel) throws Exception {
-        logger.trace("************************** Start to voice message ************************************");
-        logger.trace("file: MessageController, function: sendVoiceCampaign, userId:" + messageModel.getUser_id() + ", customerId: " + messageModel.getCustomer_id() + "," +
-                "customerId: " + messageModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: SEND," +
-                "SignatureId:" + messageModel.getSignature());
+public ResponseEntity<?> sendVoiceCampaign(@ModelAttribute MessageVoiceModel messageVoiceModel) throws Exception {
+    logger.trace("************************** Start to voice message ************************************");
+    logger.trace("file: MessageController, function: sendVoiceCampaign, userId:" + messageVoiceModel.getUser_id() + ", customerId: " + messageVoiceModel.getCustomer_id() + "," +
+            "customerId: " + messageVoiceModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: START," +
+            "SignatureId:" + messageVoiceModel.getSignature());
 
-        System.out.println("login: "+messageModel.getLogin()+" , passWord: "+ messageModel.getPassword() );
-        try {
-            String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = common.setUserCookies(pathsProperties, messageModel.getLogin(), messageModel.getPassword(), messageModel.getPartner_id());
-            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-            map.add("userId", String.valueOf(messageModel.getUser_id()));
-            map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
-            map.add("customerId", String.valueOf(messageModel.getCustomer_id()));
-            map.add("groups", String.valueOf(messageModel.getGroups()));
-            map.add("signatureName", String.valueOf(messageModel.getSignatureName()));
-            map.add("groupName", String.valueOf(messageModel.getGroupName()));
-            //map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
-            //map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
-            map.add("repeatedSMS", "0");
-            map.add("numberOrdreEnvoi", "0");
-            map.add("subject", String.valueOf(messageModel.getSubject()));
-            map.add("signature", String.valueOf(messageModel.getSignature()));
-            map.add("sourceType", "C");
-            map.add("recipients", String.valueOf(messageModel.getRecipients()));
-            map.add("groups", String.valueOf(messageModel.getGroups()));
-            map.add("content", String.valueOf(messageModel.getContent()));
-            map.add("sendingType", String.valueOf(messageModel.getSendingType()));
-            map.add("sendingDate", String.valueOf(messageModel.getSendingDate()));
-            map.add("hour", String.valueOf(messageModel.getHour()));
-            map.add("minute", String.valueOf(messageModel.getMinute()));
-            map.add("sendingTime", String.valueOf(messageModel.getSendingTime()));
-            // map.add("ACTION", "SEND");
-            map.add("sendingType", "I");
-            map.add("notSendBefore", "08:00");
-            map.add("notSendAfter", "20:00");
-            map.add("nbrLines", "");
-            map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
-            map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
-            map.add("partnerCode", String.valueOf(messageModel.getPartnerCode()));
-            map.add("appId", "WS");
-            map.add("messageId", "0");
-            map.add("ACTION", "START");
-            map.add("TypeMSG", "VOICE");
-            HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
-            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
-            System.out.println(response.getBody());
+    System.out.println("login: "+messageVoiceModel.getLogin()+" , passWord: "+ messageVoiceModel.getPassword() );
+    try {
+        String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = common.setUserCookies(pathsProperties, messageVoiceModel.getLogin(), messageVoiceModel.getPassword(), messageVoiceModel.getPartner_id());
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        CommonVoice commonVoice = new CommonVoice();
+        commonVoice.saveUploadedFile(pathsProperties, messageVoiceModel.getContent());
+      //  System.out.println("Diodio0");
+        File file = new File(pathsProperties.getPathValue("backend.files-directory") + messageVoiceModel.getContent().getOriginalFilename());
+      //  System.out.println("Diodio1");
+
+        map.add("userId", String.valueOf(messageVoiceModel.getUser_id()));
+        map.add("partnerCode", String.valueOf(messageVoiceModel.getPartnerCode()));
+        map.add("customerId", String.valueOf(messageVoiceModel.getCustomer_id()));
+        map.add("groups", String.valueOf(messageVoiceModel.getGroups()));
+        map.add("signatureName", String.valueOf(messageVoiceModel.getSignatureName()));
+        map.add("groupName", String.valueOf(messageVoiceModel.getGroupName()));
+        //map.add("numberMessage", String.valueOf(messageModel.getNumberMessage()));
+        //map.add("messageLength", String.valueOf(messageModel.getMessageLength()));
+        map.add("repeatedSMS", "0");
+        map.add("numberOrdreEnvoi", "0");
+        map.add("subject", String.valueOf(messageVoiceModel.getSubject()));
+        map.add("signature", String.valueOf(messageVoiceModel.getSignature()));
+        map.add("sourceType", "C");
+        map.add("recipients", String.valueOf(messageVoiceModel.getRecipients()));
+        map.add("groups", String.valueOf(messageVoiceModel.getGroups()));
+        map.add("content", String.valueOf(messageVoiceModel.getContent().getOriginalFilename()));
+        map.add("sendingType", String.valueOf(messageVoiceModel.getSendingType()));
+        map.add("sendingDate", String.valueOf(messageVoiceModel.getSendingDate()));
+        //map.add("hour", String.valueOf(messageVoiceModel.getHour()));
+        //map.add("minute", String.valueOf(messageVoiceModel.getMinute()));
+        map.add("sendingTime", String.valueOf(messageVoiceModel.getSendingTime()));
+        // map.add("ACTION", "SEND");
+        map.add("sendingType", "I");
+        map.add("notSendBefore", "08:00");
+        map.add("notSendAfter", "20:00");
+        map.add("nbrLines", "");
+        map.add("numberMessage", String.valueOf(messageVoiceModel.getNumberMessage()));
+        map.add("messageLength", String.valueOf(messageVoiceModel.getMessageLength()));
+        map.add("partnerCode", String.valueOf(messageVoiceModel.getPartnerCode()));
+        map.add("appId", "WS");
+        map.add("messageId", "0");
+        map.add("ACTION", "START");
+        map.add("TypeMSG", "VOICE");
+        //System.out.println("Diodio2");
+        HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
+        ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
+        System.out.println(response.getBody());
+       // int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+       // System.out.println("Diodio3");
+
+        logger.trace("response: " + response.getBody());
+       // if(response!=null || response.getBody()!=null){
+            logger.trace("response body: "+response.getBody());
             int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+            if (rc != 0) {
+                String error = (new JSONObject(response.getBody().toString())).getString("error");
+                logger.error("Error: "+error);
+                logger.error("************************** End to Create Signature ************************************");
+                return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            }
 
-            if(rc == 0)
-                return ResponseEntity.status(HttpStatus.OK).body("Voice message successfully sent.");
+           else
+              return ResponseEntity.status(HttpStatus.OK).body("Voice message successfully sent.");
 
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send voice message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.trace("************************** END SEND VOICE MESSSAGE ************************************");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
-        }
+       // return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send voice message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+        //}
     }
+    catch (Exception e) {
+        logger.error(e.getMessage());
+        logger.trace("************************** END SEND VOICE MESSSAGE ************************************");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+    }
+}
 
 }

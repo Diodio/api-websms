@@ -12,16 +12,18 @@ public class MessageListDto {
     private String content;
     private String state;
     private String createdDate;
+    private String signature;
 
     public MessageListDto() {
     }
 
-    public MessageListDto(long id, String groups, String recipients, String content, String state, String createdDate) {
+    public MessageListDto(long id, String groups, String recipients, String content, String state, String createdDate, String signature) {
         this.id = id;
         this.groups = groups;
         this.recipients = recipients;
         this.content = content;
         this.state = state;
         this.createdDate = createdDate;
+        this.signature = signature;
     }
 }

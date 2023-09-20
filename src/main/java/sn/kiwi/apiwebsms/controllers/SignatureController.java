@@ -130,25 +130,45 @@ public class SignatureController {
         logger.trace("file: SignatureController, fonction: deleteSignature, userId:"+signatureDeleteModel.getUser_id()+", login: "+signatureDeleteModel.getLogin()+"," +
                 " clientId: orangesn, urlBackend: /customer/SignatureController.php, ACTION: REMOVE");
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/customer/SignatureController.php";
-        RestTemplate restTemplate=new RestTemplate();
-        HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, signatureDeleteModel.getLogin(), signatureDeleteModel.getPassword(), signatureDeleteModel.getPartnerId());
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-        map.add("userId", ""+signatureDeleteModel.getUser_id());
-        map.add("signatureId", ""+signatureDeleteModel.getSignatureId());
-        logger.trace("signatureId", ""+signatureDeleteModel.getSignatureId());
-        map.add("ACTION", "REMOVE");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
-        ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-        System.out.println("response: "+response.getBody());
-        int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
-        if (rc != 0){
-            logger.trace("Unable to delete this signature");
-            logger.trace("************************** End to delete Signature ************************************");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to delete this signature", HttpStatus.BAD_REQUEST.value()),HttpStatus.BAD_REQUEST);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, signatureDeleteModel.getLogin(), signatureDeleteModel.getPassword(), signatureDeleteModel.getPartnerId());
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("userId", "" + signatureDeleteModel.getUser_id());
+            map.add("signatureId", "" + signatureDeleteModel.getSignatureId());
+            logger.trace("signatureId", "" + signatureDeleteModel.getSignatureId());
+            map.add("ACTION", "REMOVE");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            logger.trace("response: "+response);
+            if(response!=null || response.getBody()!=null){
+                logger.trace("response body: "+response.getBody());
+                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+                if (rc != 0) {
+                    String error = (new JSONObject(response.getBody().toString())).getString("error");
+                    logger.error("Error: "+error);
+                    logger.error("************************** End to Create Signature ************************************");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+                }
+            }
+                System.out.println("response: " + response.getBody());
+                logger.trace("response body: "+response.getBody());
+                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+                if (rc != 0) {
+                    String error = (new JSONObject(response.getBody().toString())).getString("error");
+                    logger.error("Error: "+error);
+                    logger.error("************************** End to Create Signature ************************************");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+                }
+
+            logger.trace("Signature was successfully deleted");
+            logger.trace("************************** End to Delete Signature ************************************");
+            return ResponseEntity.ok(new ApiDtoResponse(false, "Signature was successfully deleted."));
         }
-        logger.trace("Signature was successfully deleted");
-        logger.trace("************************** End to Delete Signature ************************************");
-        return ResponseEntity.ok(new ApiDtoResponse(false, "Signature was successfully deleted."));
+        catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
     }
 
 
