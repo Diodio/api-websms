@@ -13,6 +13,7 @@ public class MessageListDto {
     private String state;
     private String createdDate;
     private String signature;
+    private String typeMSG;
 
     public MessageListDto() {
     }

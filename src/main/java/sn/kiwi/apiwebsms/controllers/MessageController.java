@@ -491,7 +491,7 @@ public class MessageController {
                     content = @Content(schema = @Schema(implementation = CustomerModel.class))),
             responses = {@ApiResponse(responseCode = "200", description = "DashBoard: get stats by period of messages.",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MessageListDto.class))})}
+                            schema = @Schema(implementation = MessagesStatsDto.class))})}
     )
 
     //DashBoard
@@ -581,7 +581,7 @@ public class MessageController {
                 return ResponseEntity.ok(messageDto);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("catch: Error while processing your request. Please contact your administrator.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Catch: Error while processing your request. Please contact your administrator.");
         }
     }
 

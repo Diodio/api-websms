@@ -171,7 +171,7 @@ public class PurchaseController {
         RestTemplate restTemplate=new RestTemplate();
         HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, purchaseCTSendSMSModel.getLogin(), purchaseCTSendSMSModel.getPassword(), purchaseCTSendSMSModel.getPartner_id());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-        map.add("userId", ""+ purchaseCTSendSMSModel.getPartner_id());
+        map.add("userId", ""+ purchaseCTSendSMSModel.getUser_id());
         map.add("recipient", ""+ purchaseCTSendSMSModel.getRecipient());
         map.add("customerId", ""+ purchaseCTSendSMSModel.getCustomer_id());
         map.add("parCode", ""+ requestHeaders.get("code"));
@@ -180,7 +180,7 @@ public class PurchaseController {
 
         System.out.println("request: "+request);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-        System.out.println("reponse: " +response);
+        System.out.println("response1: " +response);
         if(response==null || response.equals("") || response.getStatusCode().value()!=200) {
             logger.error("Error while processing your request. Please contact your administrator.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
