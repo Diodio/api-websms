@@ -14,13 +14,15 @@ public class ContactsGroupDto {
 
     private int groupId;
     private String groupName;
+    private String description;
     private List<ContactsByGroupDto> contacts;
 
     public ContactsGroupDto() {}
 
-    public ContactsGroupDto(int groupId, String groupName, List<ContactsByGroupDto> contacts) {
+    public ContactsGroupDto(int groupId, String groupName, String description, List<ContactsByGroupDto> contacts) {
         this.groupId = groupId;
         this.groupName = groupName;
+        this.description = description;
         this.contacts = contacts;
     }
     @JsonProperty("contacts")
