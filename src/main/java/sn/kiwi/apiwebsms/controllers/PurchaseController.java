@@ -100,6 +100,7 @@ public class PurchaseController {
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("userId", ""+ packModel.getUser_id());
         map.add("packId", ""+ packModel.getPack_id());
+        map.add("typeMSG", "voice");
         map.add("ACTION", "GET_PARAM_PURCHASE_OM");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
 
