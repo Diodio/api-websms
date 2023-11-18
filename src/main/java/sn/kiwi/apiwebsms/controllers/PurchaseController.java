@@ -100,7 +100,7 @@ public class PurchaseController {
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("userId", ""+ packModel.getUser_id());
         map.add("packId", ""+ packModel.getPack_id());
-        map.add("typeMSG", "voice");
+        map.add("typeMSG", ""+packModel.getType_msg());
         map.add("ACTION", "GET_PARAM_PURCHASE_OM");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
 
@@ -126,6 +126,7 @@ public class PurchaseController {
             String S2M_LINK = (String) (new JSONObject(response.getBody().toString())).get("S2M_LINK");
             JSONObject obj = new JSONObject();
             obj.put("idendifiant", S2M_IDENTIFIANT);
+
             obj.put("site", S2M_SITE);
             obj.put("total", S2M_TOTAL);
             obj.put("refCommand", S2M_REF_COMMANDE);
@@ -175,7 +176,8 @@ public class PurchaseController {
         map.add("userId", ""+ purchaseCTSendSMSModel.getUser_id());
         map.add("recipient", ""+ purchaseCTSendSMSModel.getRecipient());
         map.add("customerId", ""+ purchaseCTSendSMSModel.getCustomer_id());
-        map.add("parCode", ""+ requestHeaders.get("code"));
+      //  map.add("parCode", ""+ requestHeaders.get("code"));
+        //map.add("parCode", "646146");
         map.add("ACTION", "SEND_CODE");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
 
@@ -230,6 +232,7 @@ public class PurchaseController {
             map.add("customerId", ""+ purchaseCTValidationModel.getCustomer_id());
             map.add("validationCode", ""+ purchaseCTValidationModel.getCodeValidation());
             map.add("packId", ""+ purchaseCTValidationModel.getPack_id());
+            map.add("typeMSG", ""+purchaseCTValidationModel.getType_msg());
             map.add("ACTION", "PURCHASE_CT");
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
             System.out.println("request: "+request);

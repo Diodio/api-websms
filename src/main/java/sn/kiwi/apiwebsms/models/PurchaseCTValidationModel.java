@@ -21,7 +21,7 @@ public class PurchaseCTValidationModel {
     private int customer_id;
 
     private int pack_id;
-
+    private String type_msg;
 
     private long partner_id;
 

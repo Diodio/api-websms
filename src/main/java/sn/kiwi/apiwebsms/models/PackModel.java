@@ -21,6 +21,9 @@ public class PackModel {
     @NotBlank(message = "Purchase type is required.")
     private String purchase_type;
 
+
+    private String type_msg;
+
     @NotBlank(message = "Login is required.")
     private String login;
 

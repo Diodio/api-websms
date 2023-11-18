@@ -20,6 +20,7 @@ import sn.kiwi.apiwebsms.common.Common;
 import sn.kiwi.apiwebsms.common.CommonVoice;
 import sn.kiwi.apiwebsms.config.PathsProperties;
 import sn.kiwi.apiwebsms.constants.JsonAudioMessage;
+import sn.kiwi.apiwebsms.constants.JsonStats;
 import sn.kiwi.apiwebsms.dtos.ApiDtoResponse;
 import sn.kiwi.apiwebsms.dtos.MessageDetailDto;
 import sn.kiwi.apiwebsms.dtos.MessageListDto;
@@ -523,7 +524,7 @@ public class MessageController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
             } else {
-                //MessagesStatsDto[] messageDto = mapper.readValue(JsonStats.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
+               // MessagesStatsDto[] messageDto = mapper.readValue(JsonStats.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
                 MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
                 logger.trace("************************** End to get stats by period ************************************");
                 return ResponseEntity.ok(messageDto);
