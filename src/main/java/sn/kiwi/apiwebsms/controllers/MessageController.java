@@ -523,7 +523,12 @@ public class MessageController {
                 logger.trace("************************** End to to get stats by period ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
-            } else {
+            } else { logger.trace("Body: " + response.getBody());
+                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+                if(rc != 0) {
+                    logger.error("Impossible to get this promotion list ");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, "Impossible to get this promotion list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+                }
                // MessagesStatsDto[] messageDto = mapper.readValue(JsonStats.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
                 MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
                 logger.trace("************************** End to get stats by period ************************************");
