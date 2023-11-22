@@ -285,8 +285,8 @@ public class PurchaseController {
                 return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the audio packs list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
             }
             System.out.println("response: " +response.getBody());
-            //PacksListDto[] packs = mapper.readValue(JsonPacksAudio.JSON_LIST_PACKS_AUDIO, PacksListDto[].class);
-            PacksListDto[] packs = mapper.readValue(response.getBody().toString(), PacksListDto[].class);
+            PacksListDto[] packs = mapper.readValue(JsonPacksAudio.JSON_LIST_PACKS_AUDIO, PacksListDto[].class);
+          //  PacksListDto[] packs = mapper.readValue(response.getBody().toString(), PacksListDto[].class);
             return ResponseEntity.ok(packs);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -295,7 +295,7 @@ public class PurchaseController {
     }
 
 
-    //Purchase
+    //Promotion
     @GetMapping(value = "promo", produces = "application/json")
     @Operation(
             tags = {"Promo"},
@@ -312,6 +312,8 @@ public class PurchaseController {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
         RestTemplate restTemplate=new RestTemplate();
+        String imageurl = pathsProperties.getPathValue("backend.portail") +"/promo-pub/images/" ;
+        String audiourl = pathsProperties.getPathValue("backend.portail") +"/promo-pub/audios/" ;
         try{
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, promoModel.getLogin(), promoModel.getPassword(), promoModel.getPartner_id());
             MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
@@ -320,19 +322,31 @@ public class PurchaseController {
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
             logger.trace("body: " +response.getBody());
-            if(response.getStatusCode().value() != 200) {
+            if(response.getBody()==null) {
                 logger.warn("Unable to get the promotion list ");
                 return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the promotion list", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
             }
             else {
-                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
-                if(rc != 0) {
-                    logger.error("Unable to get the promotion list");
-                    return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the promotion list", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
-                }
-            System.out.println("response: " +response.getBody());
-            PromoListDto[] promo = mapper.readValue(response.getBody().toString(), PromoListDto[].class);
-            return ResponseEntity.ok(promo);
+                System.out.println("response: " +response.getBody());
+                JSONArray promoData = new JSONArray(response.getBody().toString());
+                logger.trace("response promoData: "+promoData);
+                JSONArray allPromo = new JSONArray();
+                promoData.forEach(item -> {
+                    JSONObject promoJson = new JSONObject();
+                    logger.trace("item: "+item);
+                    JSONObject it = (JSONObject) item;
+                    logger.trace("it: "+it);
+                    promoJson.put("id", (String) it.get("id"));
+                    promoJson.put("audio", audiourl+(String) it.get("audio")+".wav");
+                    promoJson.put("image", imageurl+(String) it.get("image")+".png");
+                    logger.trace("image: "+imageurl+(String) it.get("image")+".png");
+                    promoJson.put("createdDate", (String) it.get("createdDate"));
+                    promoJson.put("startDate", (String) it.get("startDate"));
+                    promoJson.put("endDate", (String) it.get("endDate"));
+                    allPromo.put(promoJson);
+                });
+                PromoListDto[] pub = mapper.readValue(allPromo.toString(), PromoListDto[].class);
+                return ResponseEntity.ok(pub);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -340,4 +354,64 @@ public class PurchaseController {
         }
     }
 
+
+
+    //Publicité
+    @GetMapping(value = "pub", produces = "application/json")
+    @Operation(
+            tags = {"Pub"},
+            operationId = "Pub",
+            summary = "Get the list of publicity",
+            description = "Get the list of publicity",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of publicity.",
+                    content = @Content(schema = @Schema(implementation = PubModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "Found the list of publicity",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PacksListDto.class))})}
+    )
+    public ResponseEntity<?> getAllPub(@RequestBody PubModel pubModel) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
+        RestTemplate restTemplate=new RestTemplate();
+        String imageurl = pathsProperties.getPathValue("backend.portail") +"/promo-pub/images/" ;
+        logger.trace("imageurl: " +imageurl);
+        try{
+            HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, pubModel.getLogin(), pubModel.getPassword(), pubModel.getPartner_id());
+            MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+            map.add("partnerId", ""+ pubModel.getPartner_id());
+            map.add("ACTION", "RETRIEVE_ALL_PUB");
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
+            ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
+            logger.trace("body: " +response.getBody());
+            if(response.getBody()==null) {
+                logger.warn("Unable to get the publicity list ");
+                return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the publicity list", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            }
+            else {
+                System.out.println("response: " +response.getBody());
+                JSONArray pubData = new JSONArray(response.getBody().toString());
+                logger.trace("response pubData: "+pubData);
+                JSONArray allPub = new JSONArray();
+                pubData.forEach(item -> {
+                    JSONObject pubJson = new JSONObject();
+                    logger.trace("item: "+item);
+                    JSONObject it = (JSONObject) item;
+                    logger.trace("it: "+it);
+                    pubJson.put("id", (String) it.get("id"));
+                    pubJson.put("image", imageurl+(String) it.get("image")+".png");
+                    logger.trace("image: "+imageurl+(String) it.get("image")+".png");
+                    pubJson.put("createdDate", (String) it.get("createdDate"));
+                    pubJson.put("startDate", (String) it.get("startDate"));
+                    pubJson.put("endDate", (String) it.get("endDate"));
+                    allPub.put(pubJson);
+                });
+                //PubListDto[] contacts = mapper.readValue(allPromo.toString(), PubListDto[].class);
+                    PubListDto[] pub = mapper.readValue(allPub.toString(), PubListDto[].class);
+                return ResponseEntity.ok(pub);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
+        }
+    }
 }
