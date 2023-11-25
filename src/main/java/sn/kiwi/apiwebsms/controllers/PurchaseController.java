@@ -40,32 +40,76 @@ public class PurchaseController {
     @Operation(
             tags = {"Purchases"},
             operationId = "Purchases",
-            summary = "Get the list of packs",
-            description = "Get the list of packs",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of packs.",
-                    content = @Content(schema = @Schema(implementation = CustomerInfoReceivedModel.class))),
-            responses = {@ApiResponse(responseCode = "200", description = "Found the list of packs",
+            summary = "Get the list of sms and voice packs",
+            description = "Get the list of sms and voice packs",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of sms and voice packs.",
+                    content = @Content(schema = @Schema(implementation = PackListModel.class))),
+            responses = {@ApiResponse(responseCode = "200", description = "Found the list of sms and voice packs",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PacksListDto.class))})}
     )
-    public ResponseEntity<?> getAllPack(@RequestBody CustomerInfoReceivedModel customerInfoReceivedModel) throws Exception {
+    public ResponseEntity<?> getAllPack(@RequestBody PackListModel packListModel) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
         RestTemplate restTemplate=new RestTemplate();
         try{
-        HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, customerInfoReceivedModel.getLogin(), customerInfoReceivedModel.getPassword(), customerInfoReceivedModel.getPartner_id());
+        HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, packListModel.getLogin(), packListModel.getPassword(), packListModel.getPartner_id());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-        map.add("customerId", ""+ customerInfoReceivedModel.getCustomer_id());
+        map.add("customerId", ""+ packListModel.getCustomer_id());
+        map.add("customerId", ""+ packListModel.getCustomer_id());
+        map.add("typeMSG", ""+packListModel.getType_msg());
         map.add("ACTION", "LIST_PURCHASES");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
         if(response.getStatusCodeValue() != 200) {
             logger.warn("Unable to get the pack list ");
-            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the pack list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the pack sms and voice list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         }
+
             System.out.println("response: " +response.getBody());
-        PacksListDto[] packs = mapper.readValue(response.getBody().toString(), PacksListDto[].class);
-        return ResponseEntity.ok(packs);
+            PacksListDto[] packs = mapper.readValue(response.getBody().toString(), PacksListDto[].class);
+            return ResponseEntity.ok(packs);
+
+           // System.out.println("typemsg: " +packListModel.getType_msg());
+        /*if(!packListModel.getType_msg().equals("VOICE")) {
+            System.out.println("test 1");
+            PacksListDto[] packs = mapper.readValue(response.getBody().toSt ring(), PacksListDto[].class);
+            return ResponseEntity.ok(packs);
+        }
+        else {
+            System.out.println("test 2");
+            PacksVoiceListDto[] packsV = mapper.readValue(response.getBody().toString(), PacksVoiceListDto[].class);
+            return ResponseEntity.ok(packsV);
+        }
+*/
+
+
+        /*    JSONArray packData = new JSONArray(response.getBody().toString());
+            logger.trace("response packData: "+packData);
+            JSONArray allPack = new JSONArray();
+            packData.forEach(item -> {
+                JSONObject packJson = new JSONObject();
+                logger.trace("item: "+item);
+                JSONObject it = (JSONObject) item;
+                logger.trace("it: "+it);
+                packJson.put("id", (String) it.get("id"));
+                packJson.put("name", (String) it.get("name"));
+                packJson.put("duration", (String) it.get("duration"));
+                packJson.put("description", (String) it.get("description"));
+
+                System.out.println("typeMSG: " +it.get("typeMSG"));
+                //if(it.get("typeMSG")=="VOICE"){
+                packJson.put("typeMSG", (String) it.get("typeMSG"));
+                packJson.put("voiceNumberOfSecond", (String) it.get("voiceNumberOfSecond"));
+                //}
+                //else
+                packJson.put("numberOfCredits", (String) it.get("numberOfCredits"));
+                allPack.put(packJson);
+            });
+
+            System.out.println("response: " +response.getBody());
+            PacksListDto[] packs = mapper.readValue(allPack.toString(), PacksListDto[].class);
+            return ResponseEntity.ok(packs);*/
     } catch (Exception e) {
         logger.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
@@ -312,8 +356,8 @@ public class PurchaseController {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
         RestTemplate restTemplate=new RestTemplate();
-        String imageurl = pathsProperties.getPathValue("backend.portail") +"/promo-pub/images/" ;
-        String audiourl = pathsProperties.getPathValue("backend.portail") +"/promo-pub/audios/" ;
+        String imageurl = pathsProperties.getPathValue("backend.link-promo-pub") +"/images/" ;
+        String audiourl = pathsProperties.getPathValue("backend.link-promo-pub") +"/audios/" ;
         try{
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, promoModel.getLogin(), promoModel.getPassword(), promoModel.getPartner_id());
             MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
@@ -337,9 +381,9 @@ public class PurchaseController {
                     JSONObject it = (JSONObject) item;
                     logger.trace("it: "+it);
                     promoJson.put("id", (String) it.get("id"));
-                    promoJson.put("audio", audiourl+(String) it.get("audio")+".wav");
-                    promoJson.put("image", imageurl+(String) it.get("image")+".png");
-                    logger.trace("image: "+imageurl+(String) it.get("image")+".png");
+                    promoJson.put("audio", audiourl+(String) it.get("audio"));
+                    promoJson.put("image", imageurl+(String) it.get("image"));
+                    logger.trace("image: "+imageurl+(String) it.get("image"));
                     promoJson.put("createdDate", (String) it.get("createdDate"));
                     promoJson.put("startDate", (String) it.get("startDate"));
                     promoJson.put("endDate", (String) it.get("endDate"));
@@ -398,8 +442,8 @@ public class PurchaseController {
                     JSONObject it = (JSONObject) item;
                     logger.trace("it: "+it);
                     pubJson.put("id", (String) it.get("id"));
-                    pubJson.put("image", imageurl+(String) it.get("image")+".png");
-                    logger.trace("image: "+imageurl+(String) it.get("image")+".png");
+                    pubJson.put("image", imageurl+(String) it.get("image"));
+                    logger.trace("image: "+imageurl+(String) it.get("image"));
                     pubJson.put("createdDate", (String) it.get("createdDate"));
                     pubJson.put("startDate", (String) it.get("startDate"));
                     pubJson.put("endDate", (String) it.get("endDate"));

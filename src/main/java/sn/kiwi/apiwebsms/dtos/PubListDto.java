@@ -11,15 +11,17 @@ public class PubListDto {
     private String createdDate;
     private String startDate;
     private String endDate;
+    private String typeMSG;
 
     public PubListDto() {
     }
 
-    public PubListDto(long id, String image, String createdDate, String startDate, String endDate) {
+    public PubListDto(long id, String image, String createdDate, String startDate, String endDate, String typeMSG) {
         this.id = id;
         this.image = image;
         this.createdDate = createdDate;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.typeMSG=typeMSG;
     }
 }
