@@ -301,7 +301,7 @@ public class PurchaseController {
 
 
     //Purchase
-    @GetMapping(value = "packs/audio", produces = "application/json")
+   /* @GetMapping(value = "packs/audio", produces = "application/json")
     @Operation(
             tags = {"Purchases"},
             operationId = "Purchases",
@@ -336,7 +336,7 @@ public class PurchaseController {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
         }
-    }
+    }*/
 
 
     //Promotion
@@ -356,8 +356,8 @@ public class PurchaseController {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
         RestTemplate restTemplate=new RestTemplate();
-        String imageurl = pathsProperties.getPathValue("backend.link-promo-pub") +"/images/" ;
-        String audiourl = pathsProperties.getPathValue("backend.link-promo-pub") +"/audios/" ;
+        String imageurl = pathsProperties.getPathValue("backend.link-promo-pub") +"/promopub/images/" ;
+        String audiourl = pathsProperties.getPathValue("backend.link-promo-pub") +"/promopub/audios/" ;
         try{
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, promoModel.getLogin(), promoModel.getPassword(), promoModel.getPartner_id());
             MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
@@ -417,8 +417,9 @@ public class PurchaseController {
         ObjectMapper mapper = new ObjectMapper();
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/product/PackController.php";
         RestTemplate restTemplate=new RestTemplate();
-        String imageurl = pathsProperties.getPathValue("backend.portail") +"/promo-pub/images/" ;
+        String imageurl = pathsProperties.getPathValue("backend.link-promo-pub") +"/promopub/images/" ;
         logger.trace("imageurl: " +imageurl);
+        System.out.println("imageurl: " +imageurl);
         try{
             HttpHeaders requestHeaders = common.setUserCookies(pathsProperties, pubModel.getLogin(), pubModel.getPassword(), pubModel.getPartner_id());
             MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
@@ -432,9 +433,11 @@ public class PurchaseController {
                 return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to get the publicity list", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
             }
             else {
+
+                System.out.println("imageurl: " +imageurl);
                 System.out.println("response: " +response.getBody());
                 JSONArray pubData = new JSONArray(response.getBody().toString());
-                logger.trace("response pubData: "+pubData);
+                logger.trace("response 2 pubData: "+pubData);
                 JSONArray allPub = new JSONArray();
                 pubData.forEach(item -> {
                     JSONObject pubJson = new JSONObject();

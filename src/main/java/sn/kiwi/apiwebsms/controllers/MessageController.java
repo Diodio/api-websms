@@ -43,9 +43,9 @@ public class MessageController {
     @Operation(
             tags = {"Messages"},
             operationId = "Messages",
-            summary = "Get the list of messages",
-            description = "Get the list of messages sent by the customer",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of messages.",
+            summary = "Get the list of SMS and VOICE messages",
+            description = "Get the list of SMS and VOICE messages sent by the customer",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "The list of SMS and VOICE messages.",
                     content = @Content(schema = @Schema(implementation = CustomerModel.class))),
             responses = {@ApiResponse(responseCode = "200", description = "Found the list of messages",
                     content = {@Content(mediaType = "application/json",
@@ -541,7 +541,7 @@ public class MessageController {
     }
 
 
-    @GetMapping(value = "messages/audio", produces = "application/json")
+    /*@GetMapping(value = "messages/audio", produces = "application/json")
     @Operation(
             tags = {"Messages"},
             operationId = "Messages",
@@ -589,7 +589,7 @@ public class MessageController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Catch: Error while processing your request. Please contact your administrator.");
         }
-    }
+    }*/
 
 
 @PostMapping(value = "messages/voice", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = "application/json")

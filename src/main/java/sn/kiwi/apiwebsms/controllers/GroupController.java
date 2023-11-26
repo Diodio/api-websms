@@ -250,7 +250,7 @@ public class GroupController {
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
             //logger.trace("response 1: "+response);
            // System.out.println("response 1: "+response);
-            //logger.trace("body : "+response.getBody());
+            logger.trace("body : "+response.getBody());
             System.out.println("body: "+response.getBody());
             System.out.println("reponse: "+response);
             System.out.println("code: "+response.getStatusCode());
