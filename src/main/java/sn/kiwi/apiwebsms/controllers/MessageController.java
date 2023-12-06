@@ -509,6 +509,7 @@ public class MessageController {
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             map.add("userId", "" + messagesStatsModel.getUser_id());
             map.add("customerId", "" + messagesStatsModel.getCustomer_id());
+            map.add("messageId", "" + messagesStatsModel.getMessageId());
             map.add("application_id", "WS");
             map.add("ACTION", "STAT_BY_PERIOD");
             map.add("partnerCode", "290573");
@@ -517,21 +518,21 @@ public class MessageController {
             map.add("endDate", "" + messagesStatsModel.getEndDate());
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-            logger.trace("body: " + response.getBody());
+            logger.trace("body before test: " + response.getBody());
             if (response == null || response.equals("") || response.getStatusCode().value() != 200) {
                 logger.trace("Error while processing your request. Please contact your administrator.");
                 logger.trace("************************** End to to get stats by period ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while processing your request. Please contact your administrator.");
 
-            } else { logger.trace("Body: " + response.getBody());
-                int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
-                if(rc != 0) {
-                    logger.error("Impossible to get this promotion list ");
-                    return new ResponseEntity<>(new ApiDtoResponse(false, "Impossible to get this promotion list ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            } else { logger.trace("Body after test: " + response.getBody());
+               // int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
+                if(response.getBody()==null) {
+                    logger.error("Impossible to get this campaign statistic");
+                    return new ResponseEntity<>(new ApiDtoResponse(false, "Impossible to get this campaign statistic ", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
                 }
                // MessagesStatsDto[] messageDto = mapper.readValue(JsonStats.JSON_STATS_BY_PERIOD, MessagesStatsDto[].class);
                 MessagesStatsDto[] messageDto = mapper.readValue(response.getBody().toString(), MessagesStatsDto[].class);
-                logger.trace("************************** End to get stats by period ************************************");
+                logger.trace("************************** End to get stats by period by campaign ************************************");
                 return ResponseEntity.ok(messageDto);
             }
         } catch (Exception e) {

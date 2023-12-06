@@ -11,14 +11,14 @@ public class GroupListDto {
 
     private int value;
     private String text;
-    private String desc="néant";
+    private String description="néant";
 
     public GroupListDto() {
     }
 
-    public GroupListDto(int value, String text, String desc) {
+    public GroupListDto(int value, String text, String description) {
         this.value = value;
         this.text = text;
-        this.desc = desc;
+        this.description = description;
     }
 }
