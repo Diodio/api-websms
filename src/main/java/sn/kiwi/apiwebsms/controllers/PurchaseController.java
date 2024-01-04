@@ -127,7 +127,7 @@ public class PurchaseController {
             responses = {@ApiResponse(responseCode = "201", description = "orange money Pack successfully purchased")}
     )
 
-    public ResponseEntity<?> purchaseOM(@RequestBody PackModel packModel) throws Exception {
+    public ResponseEntity<?> purchaseOMQRCODE(@RequestBody PackModel packModel) throws Exception {
         logger.trace("************************** Start to send message voice ************************************");
         logger.trace("file: MessageController, function: sendVoice, userId:"+packModel.getUser_id()+", customerId: "+packModel.getCustomer_id()+
                 ", customerId: "+packModel.getCustomer_id()+ ", partnarId: "+packModel.getPartner_id()+", login: "+packModel.getLogin()+"," +
@@ -142,9 +142,13 @@ public class PurchaseController {
         map.add("userId", ""+ packModel.getUser_id());
         map.add("packId", ""+ packModel.getPack_id());
         map.add("typeMSG", ""+packModel.getType_msg());
-        map.add("ACTION", "GET_PARAM_PURCHASE_OM");
+        map.add("customerId", ""+packModel.getCustomer_id());
+        map.add("refCommand", ""+packModel.getRefCommand());
+        map.add("ACTION", "GET_PURCHASE_OM_QRCODE");
+        //map.add("ACTION", "GET_PARAM_PURCHASE_OM");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
 
+        System.out.println("RefCommand: "+packModel.getRefCommand());
         System.out.println("request: "+request);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
         System.out.println("reponse: " +response);
@@ -155,31 +159,16 @@ public class PurchaseController {
             System.out.println("Body: " + response.getBody());
             logger.trace("Body: " + response.getBody());
 
-            String S2M_IDENTIFIANT = (String) (new JSONObject(response.getBody().toString())).get("S2M_IDENTIFIANT");
-            String S2M_SITE = (String) (new JSONObject(response.getBody().toString())).get("S2M_SITE");
-            System.out.println("S2M_IDENTIFIANT: " + S2M_IDENTIFIANT);
-            String S2M_TOTAL = (String) (new JSONObject(response.getBody().toString())).get("S2M_TOTAL");
-            String S2M_REF_COMMANDE = (String) (new JSONObject(response.getBody().toString())).get("S2M_REF_COMMANDE");
-            String S2M_COMMANDE = (String) (new JSONObject(response.getBody().toString())).get("S2M_COMMANDE");
-            String S2M_DATEH = (String) (new JSONObject(response.getBody().toString())).get("S2M_DATEH");
-            String S2M_HTYPE = (String) (new JSONObject(response.getBody().toString())).get("S2M_HTYPE");
-            String S2M_HMAC = (String) (new JSONObject(response.getBody().toString())).get("S2M_HMAC");
-            String S2M_LINK = (String) (new JSONObject(response.getBody().toString())).get("S2M_LINK");
+            /*String amount = (String) (new JSONObject(response.getBody().toString())).get("amount");
+            System.out.println("amount: " + amount);
+            String message = (String) (new JSONObject(response.getBody().toString())).get("message");
             JSONObject obj = new JSONObject();
-            obj.put("idendifiant", S2M_IDENTIFIANT);
-
-            obj.put("site", S2M_SITE);
-            obj.put("total", S2M_TOTAL);
-            obj.put("refCommand", S2M_REF_COMMANDE);
-            obj.put("hashType", S2M_HTYPE);
-            obj.put("dateH", S2M_DATEH);
-            obj.put("link", S2M_LINK);
-            obj.put("command", S2M_COMMANDE);
-            obj.put("hashMac", S2M_HMAC);
+            obj.put("amount", amount);
+            obj.put("message", message);
             logger.trace("omInfos: " + obj);
-            System.out.println("omInfos: " + obj);
+            System.out.println("omInfos: " + obj);*/
 
-            PacksOMDto packs = mapper.readValue(obj.toString(), PacksOMDto.class);
+            PacksOMDto packs = mapper.readValue(response.getBody().toString(), PacksOMDto.class);
             logger.trace("packs: " + packs);
             return ResponseEntity.ok(packs);
         }

@@ -9,30 +9,17 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 //@AllArgsConstructor
 public class PacksOMDto {
 
-    private String idendifiant;
-    private String site;
-    private String total;
-    private String refCommand;
-    private String hashType;
-    private String dateH;
-    private String link;
-    private String command;
-    private String hashMac;
+    private String amount;
+    private String message;
 
 
 
     public PacksOMDto() {
     }
 
-    public PacksOMDto(String idendifiant, String site, String total, String refCommand, String hashType, String dateH, String link, String command, String hashMac) {
-        this.idendifiant = idendifiant;
-        this.site = site;
-        this.total = total;
-        this.refCommand = refCommand;
-        this.hashType = hashType;
-        this.dateH = dateH;
-        this.link = link;
-        this.command = command;
-        this.hashMac = hashMac;
+    public PacksOMDto(String amount, String message) {
+        this.amount = amount;
+        this.message = message;
+
     }
 }

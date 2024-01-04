@@ -34,4 +34,6 @@ public class PackModel {
     private long partner_id;
     @NotBlank(message = "id user is required.")
     private long user_id;
+    @NotBlank(message = "refCommand is required.")
+    private String refCommand;
 }

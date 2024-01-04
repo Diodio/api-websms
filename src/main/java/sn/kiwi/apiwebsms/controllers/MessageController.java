@@ -70,7 +70,7 @@ public class MessageController {
             map.add("partnerCode", "290573");
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, requestHeaders);
             ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, request, String.class);
-            logger.trace("response: " + response);
+            logger.trace("response 1: " + response);
             logger.trace("status: " + response.getStatusCode());
 
             JSONArray jsonRep = new JSONArray(response.getBody().toString());
@@ -81,6 +81,7 @@ public class MessageController {
                 logger.trace("************************** End to get all messages ************************************");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data available.");
             } else {
+                logger.trace("body: " + response.getBody());
                 MessageListDto[] messageDto = mapper.readValue(response.getBody().toString(), MessageListDto[].class);
                 logger.trace("************************** End to get all messages ************************************");
                 return ResponseEntity.ok(messageDto);
