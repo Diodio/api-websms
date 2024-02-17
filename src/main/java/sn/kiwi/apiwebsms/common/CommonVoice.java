@@ -141,12 +141,13 @@ public class CommonVoice {
     }
 
     public void saveUploadedFile(PathsProperties pathsProperties, MultipartFile file) throws IOException {
-        System.out.println("Diodio01");
+        System.out.println("file 1: "+file);
 
         if (!file.isEmpty()) {
-            System.out.println("Diodio02");
+            System.out.println("file: 2");
             byte[] bytes = file.getBytes();
             Path path = Paths.get(pathsProperties.getPathValue("backend.files-directory") + file.getOriginalFilename());
+            System.out.println("file: 3");
             Files.write(path, bytes);
         }
     }

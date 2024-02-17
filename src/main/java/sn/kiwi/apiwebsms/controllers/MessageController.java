@@ -606,24 +606,28 @@ public class MessageController {
     )
 
 public ResponseEntity<?> sendVoiceCampaign(@ModelAttribute MessageVoiceModel messageVoiceModel) throws Exception {
+    System.out.println("Diodio000");
     logger.trace("************************** Start to voice message ************************************");
     logger.trace("file: MessageController, function: sendVoiceCampaign, userId:" + messageVoiceModel.getUser_id() + ", customerId: " + messageVoiceModel.getCustomer_id() + "," +
             "customerId: " + messageVoiceModel.getCustomer_id() + ", clientId: orangesn, urlBackend: /message/CampaignController.php, ACTION: START," +
             "SignatureId:" + messageVoiceModel.getSignature());
 
+    System.out.println("Diodio00");
     System.out.println("login: "+messageVoiceModel.getLogin()+" , passWord: "+ messageVoiceModel.getPassword() );
     try {
+        System.out.println("Diodio0");
         String backendUrl = pathsProperties.getPathValue("backend.url") + "/message/CampaignController.php";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = common.setUserCookies(pathsProperties, messageVoiceModel.getLogin(), messageVoiceModel.getPassword(), messageVoiceModel.getPartner_id());
-
+        System.out.println("Diodio11");
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         CommonVoice commonVoice = new CommonVoice();
+        System.out.println("Diodio112");
         commonVoice.saveUploadedFile(pathsProperties, messageVoiceModel.getContent());
-      //  System.out.println("Diodio0");
+        System.out.println("Diodio113");
         File file = new File(pathsProperties.getPathValue("backend.files-directory") + messageVoiceModel.getContent().getOriginalFilename());
-      //  System.out.println("Diodio1");
+        System.out.println("Diodio3");
 
         map.add("userId", String.valueOf(messageVoiceModel.getUser_id()));
         map.add("partnerCode", String.valueOf(messageVoiceModel.getPartnerCode()));
@@ -658,26 +662,29 @@ public ResponseEntity<?> sendVoiceCampaign(@ModelAttribute MessageVoiceModel mes
         map.add("messageId", "0");
         map.add("ACTION", "START");
         map.add("TypeMSG", "VOICE");
-        //System.out.println("Diodio2");
+        System.out.println("Diodio4");
         HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(map, headers);
         ResponseEntity<?> response = restTemplate.exchange(backendUrl, HttpMethod.POST, requestHeader, String.class);
         System.out.println(response.getBody());
        // int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
-       // System.out.println("Diodio3");
+       System.out.println("Diodio5");
 
         logger.trace("response: " + response.getBody());
        // if(response!=null || response.getBody()!=null){
             logger.trace("response body: "+response.getBody());
             int rc = (new JSONObject(response.getBody().toString())).getInt("rc");
             if (rc != 0) {
+                System.out.println("Diodio6");
                 String error = (new JSONObject(response.getBody().toString())).getString("error");
                 logger.error("Error: "+error);
                 logger.error("************************** End to Create Signature ************************************");
                 return new ResponseEntity<>(new ApiDtoResponse(false, error, HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
             }
 
-           else
-              return ResponseEntity.status(HttpStatus.OK).body("Voice message successfully sent.");
+           else{
+                System.out.println("Diodio7");
+                return ResponseEntity.status(HttpStatus.OK).body("Voice message successfully sent.");
+            }
 
        // return new ResponseEntity<>(new ApiDtoResponse(false, "Unable to send voice message", HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
         //}
